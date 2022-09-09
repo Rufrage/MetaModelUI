@@ -17,7 +17,8 @@ export default function MenuListItem({
   const selected = useMatch(route);
   /** Call Link programmatically on hotkey press */
   const navigate = useNavigate();
-  useHotkeys(hotkey, () => {
+  useHotkeys(hotkey, (event) => {
+    event.preventDefault();
     navigate(route);
   });
 
