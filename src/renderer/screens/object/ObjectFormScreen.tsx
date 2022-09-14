@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, Card, Grid, Typography } from '@mui/material';
 import { MMObject } from '@rufrage/metamodel';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -21,7 +21,12 @@ const schema = yup
 
 export default function ObjectFormScreen() {
   /** Use ObjectsContext to add new Objects */
-  const { addObject } = useContext(ObjectsContext);
+  const { readObject, insertObject, updateObject } = useContext(ObjectsContext);
+
+  const [editObject, setEditObject] = useState<MMObject | undefined>();
+  const [editObjectLoading, setEditObjectLoading] = useState<boolean>(false);
+  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
+
   /** Use NavigationContext */
   const navigate = useNavigate();
 
@@ -29,21 +34,28 @@ export default function ObjectFormScreen() {
   const { id } = useParams();
 
   /** Create a form with yup schema validation */
-  const { handleSubmit, control } = useForm({
+  const { handleSubmit, setValue, control } = useForm({
     resolver: yupResolver(schema),
   });
 
   /** Handle submit */
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     /** Create a new MMObject and add it to the list of MMObjects */
-    const newObject = new MMObject(data.name, data.description);
-    addObject(newObject);
-
+    const objectData = new MMObject(data.name, data.description, id);
+    setSubmitLoading(true);
+    if (id !== 'new' && editObject !== undefined) {
+      await updateObject(objectData);
+    } else if (id === 'new') {
+      await insertObject(objectData);
+    }
+    setSubmitLoading(false);
     navigate(-1);
   };
 
   /** Navigate back Hotkey */
-  useHotkeys('esc', () => navigate(-1));
+  useHotkeys('esc', () => navigate(-1), {
+    enableOnTags: ['INPUT', 'TEXTAREA', 'SELECT'],
+  });
   useHotkeys(
     'ctrl + s',
     () => {
@@ -53,6 +65,28 @@ export default function ObjectFormScreen() {
       enableOnTags: ['INPUT', 'TEXTAREA', 'SELECT'],
     }
   );
+
+  useEffect(() => {
+    if (id !== undefined && id !== 'new') {
+      // Load the object for editing
+      const loadEditObject = async () => {
+        setEditObjectLoading(true);
+        const newEditObject = await readObject(id);
+        setEditObjectLoading(false);
+        setEditObject(newEditObject);
+      };
+
+      // Initialize
+      loadEditObject();
+    }
+  }, [id, readObject]);
+
+  useEffect(() => {
+    if (editObject && setValue) {
+      setValue('name', editObject.name);
+      setValue('description', editObject.description);
+    }
+  }, [editObject, setValue]);
 
   return (
     <ScreenFrame name={id === 'new' ? 'New Object' : 'Edit Object'}>
@@ -64,7 +98,11 @@ export default function ObjectFormScreen() {
             </Grid>
             <Grid item xs={6}>
               <Box display="flex" justifyContent="flex-end">
-                <Button type="submit" variant="contained">
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={editObjectLoading || submitLoading}
+                >
                   Save
                 </Button>
               </Box>
@@ -75,6 +113,8 @@ export default function ObjectFormScreen() {
                 name="name"
                 label="Name"
                 autofocus
+                defaultValue={editObject?.name}
+                disabled={editObjectLoading || submitLoading}
               />
             </Grid>
             <Grid item xs={12} sx={{ paddingTop: 2 }}>
@@ -82,6 +122,8 @@ export default function ObjectFormScreen() {
                 control={control}
                 name="description"
                 label="Description"
+                defaultValue={editObject?.description}
+                disabled={editObjectLoading || submitLoading}
               />
             </Grid>
           </Grid>

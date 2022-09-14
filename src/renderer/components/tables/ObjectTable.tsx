@@ -1,6 +1,8 @@
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
+import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import {
   Card,
+  Grid,
   IconButton,
   Table,
   TableBody,
@@ -10,8 +12,11 @@ import {
   TableRow,
 } from '@mui/material';
 import { MMObject } from '@rufrage/metamodel';
+import { useContext, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Link, useNavigate } from 'react-router-dom';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { ObjectsContext } from 'renderer/providers/ObjectsProvider';
 
 interface ObjectTableProps {
   objectsFiltered: MMObject[];
@@ -20,6 +25,9 @@ interface ObjectTableProps {
 export default function ObjectTable({ objectsFiltered }: ObjectTableProps) {
   const navigate = useNavigate();
   useHotkeys('ctrl+N', () => navigate('/objects/new'));
+
+  const { readObjects } = useContext(ObjectsContext);
+  const [objectsLoading, setObjectsLoading] = useState(false);
 
   return (
     <Card elevation={2} sx={{ padding: 2, marginTop: 2 }}>
@@ -39,6 +47,21 @@ export default function ObjectTable({ objectsFiltered }: ObjectTableProps) {
               </TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Description</TableCell>
+              <TableCell align="right">
+                <Grid container justifyContent="flex-end">
+                  <Grid item alignItems="end">
+                    <IconButton
+                      size="small"
+                      aria-label="Refresh objects list"
+                      onClick={() => {
+                        readObjects();
+                      }}
+                    >
+                      <RefreshOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -56,6 +79,20 @@ export default function ObjectTable({ objectsFiltered }: ObjectTableProps) {
                   {object.name}
                 </TableCell>
                 <TableCell>{object.description}</TableCell>
+                <TableCell align="right">
+                  <Grid container justifyContent="flex-end">
+                    <Grid item alignItems="end">
+                      <IconButton
+                        component={Link}
+                        aria-label="Edit Object"
+                        to={`/objects/${object.id}`}
+                        color="primary"
+                      >
+                        <EditOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -1,65 +1,73 @@
 import { MMObject } from '@rufrage/metamodel';
-import { getApp } from 'firebase/app';
 import {
   addDoc,
   collection,
+  doc,
   FirestoreDataConverter,
+  getDoc,
   getDocs,
-  getFirestore,
   query,
   QueryDocumentSnapshot,
+  updateDoc,
 } from 'firebase/firestore';
+import _ from 'lodash';
+import { db } from 'renderer/firebase/firebaseUtil';
 
-class ObjectItem extends MMObject {
-  /**
-   *
-   * @param id ID from firebase
-   * @param name
-   * @param description
-   */
-  constructor(
-    public id: string,
-    public name: string,
-    public description: string
-  ) {
-    super(name, description);
-  }
+const objectConverter: FirestoreDataConverter<MMObject> = {
+  toFirestore: (object: MMObject) => {
+    return { name: object.name, description: object.description };
+  },
+  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
+    const data = snapshot.data();
+    const newObject = new MMObject(data.name, data.description, snapshot.id);
 
-  public static objectConverter: FirestoreDataConverter<ObjectItem> = {
-    toFirestore: (object: ObjectItem) => {
-      return object;
-    },
-    fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-      const data = snapshot.data();
-      return new ObjectItem(snapshot.id, data.name, data.description);
-    },
-  };
-}
-
-const db = getFirestore(getApp());
+    return newObject;
+  },
+};
 
 /** Returns a reference to the object collection */
 const getObjectCollection = () => {
-  return collection(db, 'objects').withConverter<ObjectItem>(
-    ObjectItem.objectConverter
-  );
+  return collection(db, 'objects').withConverter<MMObject>(objectConverter);
 };
 
-const getObjects = async () => {
+/** Returns a reference to the object */
+const getObjectRef = (id: string) => {
+  return doc(db, 'objects', id).withConverter<MMObject>(objectConverter);
+};
+
+async function getObjects(): Promise<MMObject[]> {
   const q = query(getObjectCollection());
 
-  const querySnapshot = await getDocs(q);
-
-  const objectsLst = querySnapshot.docs.map((data) => {
-    return { ...data.data() };
+  const querySnapshot = await getDocs<MMObject>(q);
+  return querySnapshot.docs.map((data) => {
+    return data.data();
   });
+}
 
-  return objectsLst;
-};
+async function getObject(id: string): Promise<MMObject | undefined> {
+  const docSnapshot = await getDoc<MMObject>(getObjectRef(id));
+  return docSnapshot.data();
+}
 
-const addObject = async (docData: ObjectItem) => {
-  const newDoc = await addDoc(getObjectCollection(), docData);
-  return newDoc;
-};
+async function addObject(docData: MMObject): Promise<MMObject> {
+  const newdoc = await addDoc(getObjectCollection(), docData);
+  return new MMObject(docData.name, docData.description, newdoc.id);
+}
 
-export default { getObjectCollection, getObjects, addObject };
+async function saveObject(docData: MMObject): Promise<MMObject> {
+  console.log('Updating ', docData);
+  if (docData.id) {
+    try {
+      const updatedDoc = await updateDoc(getObjectRef(docData.id), {
+        name: docData.name,
+        description: docData.description,
+      });
+      console.log('Updated successfully: ', docData);
+    } catch (error) {
+      console.log('Error: ', error);
+    }
+  }
+  return docData;
+}
+
+export { getObjectCollection, getObjects, getObject, addObject, saveObject };

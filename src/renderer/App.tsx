@@ -1,8 +1,6 @@
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
-import { initializeApp } from 'firebase/app';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import NavigationFrame from 'renderer/components/navigation/NavigationFrame';
-import firebaseConfig from 'renderer/firebase/firebaseUtil';
 import AuthProvider from 'renderer/providers/AuthProvider';
 import ObjectsProvider from 'renderer/providers/ObjectsProvider';
 import LoginScreen from 'renderer/screens/auth/LoginScreen';
@@ -19,9 +17,6 @@ const themes = {
     palette: { mode: 'dark' },
   }),
 };
-
-/** Initialize Firebase */
-initializeApp(firebaseConfig);
 
 export default function App() {
   return (

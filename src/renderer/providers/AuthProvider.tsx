@@ -1,4 +1,4 @@
-import { FirebaseError, initializeApp } from 'firebase/app';
+import { FirebaseError } from 'firebase/app';
 import {
   AuthErrorCodes,
   createUserWithEmailAndPassword,
@@ -9,7 +9,6 @@ import {
   User,
 } from 'firebase/auth';
 import { createContext, useEffect, useState } from 'react';
-import firebaseConfig from 'renderer/firebase/firebaseUtil';
 
 export type AuthContextContent = {
   user: User | null;
