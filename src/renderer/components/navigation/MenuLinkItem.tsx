@@ -1,6 +1,5 @@
 import { Avatar, ListItemText, MenuItem } from '@mui/material';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { NavLink, useMatch, useNavigate } from 'react-router-dom';
+import { NavLink, useMatch } from 'react-router-dom';
 
 interface MenuListItemProps {
   route: string;
@@ -15,12 +14,6 @@ export default function MenuListItem({
 }: MenuListItemProps) {
   /** Match the current route against this list element to check current selection */
   const selected = useMatch(route);
-  /** Call Link programmatically on hotkey press */
-  const navigate = useNavigate();
-  useHotkeys(hotkey, (event) => {
-    event.preventDefault();
-    navigate(route);
-  });
 
   return (
     <MenuItem selected={selected != null} component={NavLink} to={route}>

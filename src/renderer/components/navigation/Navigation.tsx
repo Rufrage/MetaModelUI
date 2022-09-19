@@ -7,11 +7,36 @@ import {
   Typography,
 } from '@mui/material';
 import { useContext } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from 'renderer/providers/AuthProvider';
 import MenuListItem from './MenuLinkItem';
 
 const Navigation = () => {
   const { user, logout } = useContext(AuthContext);
+
+  /** Call Link programmatically on hotkey press */
+  const navigate = useNavigate();
+  useHotkeys('H', (event) => {
+    event.preventDefault();
+    navigate('/');
+  });
+  useHotkeys('O', (event) => {
+    event.preventDefault();
+    navigate('/objects/');
+  });
+  useHotkeys('V', (event) => {
+    event.preventDefault();
+    navigate('/views/');
+  });
+  useHotkeys('L', (event) => {
+    event.preventDefault();
+    navigate('/auth/');
+  });
+  useHotkeys('R', (event) => {
+    event.preventDefault();
+    navigate('/auth/register/');
+  });
 
   return (
     <Container>
@@ -26,13 +51,18 @@ const Navigation = () => {
                 {user ? (
                   <MenuList>
                     <MenuListItem route="/" label="Home" hotkey="H" />
-                    <MenuListItem route="/objects" label="Objects" hotkey="O" />
+                    <MenuListItem
+                      route="/objects/"
+                      label="Objects"
+                      hotkey="O"
+                    />
+                    <MenuListItem route="/views/" label="Views" hotkey="V" />
                   </MenuList>
                 ) : (
                   <MenuList>
-                    <MenuListItem route="/auth" label="Login" hotkey="L" />
+                    <MenuListItem route="/auth/" label="Login" hotkey="L" />
                     <MenuListItem
-                      route="/auth/register"
+                      route="/auth/register/"
                       label="Register"
                       hotkey="R"
                     />
