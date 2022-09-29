@@ -55,8 +55,14 @@ const Navigation = () => {
                       route="/objects/"
                       label="Objects"
                       hotkey="O"
+                      nested
                     />
-                    <MenuListItem route="/views/" label="Views" hotkey="V" />
+                    <MenuListItem
+                      route="/views/"
+                      label="Views"
+                      hotkey="V"
+                      nested
+                    />
                   </MenuList>
                 ) : (
                   <MenuList>

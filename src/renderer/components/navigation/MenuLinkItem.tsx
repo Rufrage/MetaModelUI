@@ -5,15 +5,20 @@ interface MenuListItemProps {
   route: string;
   label: string;
   hotkey: string;
+  nested?: boolean;
 }
 
 export default function MenuListItem({
   route,
   label,
   hotkey,
+  nested = false,
 }: MenuListItemProps) {
-  /** Match the current route against this list element to check current selection */
-  const selected = useMatch(route);
+  /**
+   * Match the current route against this list element to check current selection.
+   * If the nested flag is set, sub routes will be matched as well.
+   */
+  const selected = useMatch(nested ? `${route}*` : route);
 
   return (
     <MenuItem selected={selected != null} component={NavLink} to={route}>
