@@ -19,10 +19,10 @@ const NavigationFrame = ({
   const { user } = useContext(AuthContext);
   return (
     <Grid container spacing={2}>
-      <Grid item xs={3}>
+      <Grid item xs={4} sm={3} lg={2}>
         <Navigation />
       </Grid>
-      <Grid item xs={9}>
+      <Grid item xs={8} sm={9} lg={10}>
         {routesProtected ? (
           /** If the routes are protected and the user is not logged in, route to the login path */
           !user ? (

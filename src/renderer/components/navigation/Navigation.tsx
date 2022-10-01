@@ -1,6 +1,13 @@
+import AutoAwesomeMosaicOutlinedIcon from '@mui/icons-material/AutoAwesomeMosaicOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
+import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {
   Button,
   Container,
+  Divider,
   Grid,
   MenuList,
   Paper,
@@ -29,6 +36,10 @@ const Navigation = () => {
     event.preventDefault();
     navigate('/views/');
   });
+  useHotkeys('T', (event) => {
+    event.preventDefault();
+    navigate('/templates/');
+  });
   useHotkeys('L', (event) => {
     event.preventDefault();
     navigate('/auth/');
@@ -47,30 +58,77 @@ const Navigation = () => {
               <Grid item pt={2} pl={2}>
                 <Typography variant="h6">Navigation</Typography>
               </Grid>
-              <Grid item>
+              <Grid item pt={4}>
                 {user ? (
-                  <MenuList>
-                    <MenuListItem route="/" label="Home" hotkey="H" />
-                    <MenuListItem
-                      route="/objects/"
-                      label="Objects"
-                      hotkey="O"
-                      nested
-                    />
-                    <MenuListItem
-                      route="/views/"
-                      label="Views"
-                      hotkey="V"
-                      nested
-                    />
-                  </MenuList>
+                  <>
+                    <Divider />
+                    <MenuList>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          paddingLeft: 2,
+                          paddingBottom: 1,
+                          fontWeight: 600,
+                        }}
+                      >
+                        Model
+                      </Typography>
+                      <MenuListItem
+                        route="/"
+                        label="Home"
+                        hotkey="H"
+                        icon={<HomeOutlinedIcon fontSize="small" />}
+                      />
+                      <MenuListItem
+                        route="/objects/"
+                        label="Objects"
+                        hotkey="O"
+                        icon={<DataObjectOutlinedIcon fontSize="small" />}
+                        nested
+                      />
+                      <MenuListItem
+                        route="/views/"
+                        label="Views"
+                        hotkey="V"
+                        icon={
+                          <AutoAwesomeMosaicOutlinedIcon fontSize="small" />
+                        }
+                        nested
+                      />
+                    </MenuList>
+                    <Divider />
+                    <MenuList>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          paddingLeft: 2,
+                          paddingBottom: 1,
+                          fontWeight: 600,
+                        }}
+                      >
+                        Code
+                      </Typography>
+                      <MenuListItem
+                        route="/templates/"
+                        label="Templates"
+                        hotkey="T"
+                        icon={<TextSnippetIcon fontSize="small" />}
+                      />
+                    </MenuList>
+                  </>
                 ) : (
                   <MenuList>
-                    <MenuListItem route="/auth/" label="Login" hotkey="L" />
+                    <MenuListItem
+                      route="/auth/"
+                      label="Login"
+                      hotkey="L"
+                      icon={<LoginOutlinedIcon fontSize="small" />}
+                    />
                     <MenuListItem
                       route="/auth/register/"
                       label="Register"
                       hotkey="R"
+                      icon={<PersonAddAltOutlinedIcon fontSize="small" />}
                     />
                   </MenuList>
                 )}
