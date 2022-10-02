@@ -1,4 +1,7 @@
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
+import AutoAwesomeMosaicOutlined from '@mui/icons-material/AutoAwesomeMosaicOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import {
   Card,
@@ -11,11 +14,11 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { MMTemplate } from '@rufrage/metamodel';
+import Badge from '@mui/material/Badge';
+import { MMTemplate, MMTemplateInputType } from '@rufrage/metamodel';
 import { useContext, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Link, useNavigate } from 'react-router-dom';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { TemplatesContext } from 'renderer/providers/TemplatesProvider';
 
 interface TemplateTableProps {
@@ -49,6 +52,7 @@ export default function TemplateTable({
               </TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Filepath</TableCell>
+              <TableCell>Inputs</TableCell>
               <TableCell align="right">
                 <Grid container justifyContent="flex-end">
                   <Grid item alignItems="end">
@@ -81,6 +85,42 @@ export default function TemplateTable({
                   {template.name}
                 </TableCell>
                 <TableCell>{template.filepath}</TableCell>
+                <TableCell>
+                  <Grid container spacing={2}>
+                    {template.objectInputType ===
+                    MMTemplateInputType.None ? null : (
+                      <Grid item>
+                        <Badge
+                          color="secondary"
+                          badgeContent={
+                            template.objectInputType ===
+                            MMTemplateInputType.Single
+                              ? 1
+                              : 'N'
+                          }
+                        >
+                          <DataObjectOutlinedIcon />
+                        </Badge>
+                      </Grid>
+                    )}
+                    {template.viewInputType ===
+                    MMTemplateInputType.None ? null : (
+                      <Grid item>
+                        <Badge
+                          color="secondary"
+                          badgeContent={
+                            template.viewInputType ===
+                            MMTemplateInputType.Single
+                              ? 1
+                              : 'N'
+                          }
+                        >
+                          <AutoAwesomeMosaicOutlined />
+                        </Badge>
+                      </Grid>
+                    )}
+                  </Grid>
+                </TableCell>
                 <TableCell align="right">
                   <Grid container justifyContent="flex-end">
                     <Grid item alignItems="end">

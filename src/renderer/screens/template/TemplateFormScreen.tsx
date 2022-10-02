@@ -1,11 +1,23 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, Card, Grid, Typography } from '@mui/material';
-import { MMTemplate } from '@rufrage/metamodel';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
+import {
+  Box,
+  Button,
+  Card,
+  Grid,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Paper,
+  Typography,
+} from '@mui/material';
+import { MMTemplate, MMTemplateInputType } from '@rufrage/metamodel';
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate, useParams } from 'react-router-dom';
 import FileInput from 'renderer/components/inputs/FileInput';
+import RadioInput from 'renderer/components/inputs/RadioInput';
 import TextAreaInput from 'renderer/components/inputs/TextAreaInput';
 import TextFieldInput from 'renderer/components/inputs/TextFieldInput';
 import ScreenFrame from 'renderer/components/navigation/ScreenFrame';
@@ -18,8 +30,24 @@ const schema = yup
     name: yup.string().required('The name is required!'),
     filepath: yup.string().required('The filepath is required!'),
     description: yup.string().required('The description is required!'),
+    objectInputType: yup
+      .number()
+      .required('The Object Input Type is required!'),
+    viewInputType: yup.number().required('The View Input Type is required!'),
   })
   .required();
+
+const inputOptions = [
+  { label: 'None', value: MMTemplateInputType.None },
+  {
+    label: 'Single',
+    value: MMTemplateInputType.Single,
+  },
+  {
+    label: 'Multi',
+    value: MMTemplateInputType.Multi,
+  },
+];
 
 export default function TemplateFormScreen() {
   /** Use TemplatesContext to add new Templates */
@@ -44,21 +72,19 @@ export default function TemplateFormScreen() {
 
   /** Handle submit */
   const onSubmit = async (data: any) => {
-    console.log('Submitting...', data);
     /** Create a new MMTemplate and add it to the list of MMTemplates */
     const templateData = new MMTemplate(
       data.name,
       data.filepath,
       data.description,
-      id
+      id,
+      data.objectInputType,
+      data.viewInputType
     );
     setSubmitLoading(true);
-    console.log('ID: ', id);
     if (id !== 'new' && editTemplate !== undefined) {
-      console.log('Calling update');
       await updateTemplate(templateData);
     } else if (id === 'new') {
-      console.log('Calling insert');
       await insertTemplate(templateData);
     }
     setSubmitLoading(false);
@@ -99,6 +125,8 @@ export default function TemplateFormScreen() {
       setValue('name', editTemplate.name);
       setValue('filepath', editTemplate.filepath);
       setValue('description', editTemplate.description);
+      setValue('objectInputType', editTemplate.objectInputType);
+      setValue('viewInputType', editTemplate.viewInputType);
     }
   }, [editTemplate, setValue]);
 
@@ -128,6 +156,7 @@ export default function TemplateFormScreen() {
                 label="Name"
                 autofocus
                 defaultValue={editTemplate?.name}
+                helperText="Enter the template name"
                 disabled={editTemplateLoading || submitLoading}
               />
             </Grid>
@@ -139,6 +168,7 @@ export default function TemplateFormScreen() {
                 fullWidth
                 autofocus
                 defaultValue={editTemplate?.filepath}
+                helperText="Pick the template file"
                 disabled={editTemplateLoading || submitLoading}
               />
             </Grid>
@@ -148,8 +178,46 @@ export default function TemplateFormScreen() {
                 name="description"
                 label="Description"
                 defaultValue={editTemplate?.description}
+                helperText="Enter the template description"
                 disabled={editTemplateLoading || submitLoading}
               />
+            </Grid>
+            <Grid item xs={12} sx={{ paddingTop: 2 }}>
+              <Typography variant="h6">Inputs</Typography>
+            </Grid>
+            <Grid item xs={12} sx={{ paddingTop: 2 }}>
+              <Paper elevation={1} sx={{ padding: 1 }}>
+                <RadioInput
+                  row
+                  control={control}
+                  name="objectInputType"
+                  label="Objects"
+                  defaultValue={
+                    editTemplate
+                      ? editTemplate.objectInputType
+                      : MMTemplateInputType.None
+                  }
+                  disabled={editTemplateLoading || submitLoading}
+                  options={inputOptions}
+                />
+              </Paper>
+            </Grid>
+            <Grid item xs={12} sx={{ paddingTop: 2 }}>
+              <Paper elevation={1} sx={{ padding: 1 }}>
+                <RadioInput
+                  control={control}
+                  name="viewInputType"
+                  label="Views"
+                  defaultValue={
+                    editTemplate
+                      ? editTemplate.viewInputType
+                      : MMTemplateInputType.None
+                  }
+                  disabled={editTemplateLoading || submitLoading}
+                  row
+                  options={inputOptions}
+                />
+              </Paper>
             </Grid>
           </Grid>
         </form>

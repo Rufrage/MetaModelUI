@@ -1,9 +1,9 @@
-import { MMObject, MMTemplate } from '@rufrage/metamodel';
+import { MMTemplate } from '@rufrage/metamodel';
 import { createContext, useEffect, useState } from 'react';
 import {
   addTemplate,
-  getTemplates,
   getTemplate,
+  getTemplates,
   saveTemplate,
 } from 'renderer/services/TemplateService';
 
@@ -18,7 +18,6 @@ export type TemplatesContextContent = {
 export const TemplatesContext = createContext<TemplatesContextContent>({
   templates: [],
   insertTemplate: () => {
-    console.log('Default called');
     return new Promise((resolve) => resolve(undefined));
   },
   updateTemplate: () => {
@@ -47,6 +46,7 @@ export default function TemplatesProvider({
       setTemplates(templateItems);
       return true;
     } catch (error) {
+      console.log('Error: ', error);
       return false;
     }
   }
@@ -64,10 +64,8 @@ export default function TemplatesProvider({
   async function insertTemplate(
     newTemplate: MMTemplate
   ): Promise<MMTemplate | undefined> {
-    console.log('Insert Template..');
     try {
       const addedTemplate = await addTemplate(newTemplate);
-      console.log('Added');
       await readTemplates();
       return addedTemplate;
     } catch (error) {
@@ -84,6 +82,7 @@ export default function TemplatesProvider({
       await readTemplates();
       return updatedTemplate;
     } catch (error) {
+      console.log('Error: ', error);
       return updateData;
     }
   }

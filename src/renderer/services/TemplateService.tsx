@@ -10,7 +10,6 @@ import {
   QueryDocumentSnapshot,
   updateDoc,
 } from 'firebase/firestore';
-import _ from 'lodash';
 import { db } from 'renderer/firebase/firebaseUtil';
 
 const templateConverter: FirestoreDataConverter<MMTemplate> = {
@@ -19,6 +18,8 @@ const templateConverter: FirestoreDataConverter<MMTemplate> = {
       name: template.name,
       filepath: template.filepath,
       description: template.description,
+      objectInputType: template.objectInputType,
+      viewInputType: template.viewInputType,
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
@@ -27,7 +28,9 @@ const templateConverter: FirestoreDataConverter<MMTemplate> = {
       data.name,
       data.filepath,
       data.description,
-      snapshot.id
+      snapshot.id,
+      data.objectInputType,
+      data.viewInputType
     );
 
     return newTemplate;
@@ -66,20 +69,22 @@ async function addTemplate(docData: MMTemplate): Promise<MMTemplate> {
     docData.name,
     docData.filepath,
     docData.description,
-    newdoc.id
+    newdoc.id,
+    docData.objectInputType,
+    docData.viewInputType
   );
 }
 
 async function saveTemplate(docData: MMTemplate): Promise<MMTemplate> {
-  console.log('Updating ', docData);
   if (docData.id) {
     try {
       const updatedDoc = await updateDoc(getTemplateRef(docData.id), {
         name: docData.name,
         filepath: docData.filepath,
         description: docData.description,
+        objectInputType: docData.objectInputType,
+        viewInputType: docData.viewInputType,
       });
-      console.log('Updated successfully: ', docData);
     } catch (error) {
       console.log('Error: ', error);
     }

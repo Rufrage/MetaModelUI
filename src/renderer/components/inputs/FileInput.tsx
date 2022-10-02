@@ -37,7 +37,7 @@ export default function FileInput({
         fieldState: { error },
       }) => {
         return (
-          <Grid container xs={12}>
+          <Grid container>
             <Grid item xs={8}>
               <TextField
                 /** Pass controller props to controlled input */
@@ -58,6 +58,7 @@ export default function FileInput({
                 autoFocus={autofocus}
                 type="text"
                 fullWidth={fullWidth}
+                onClick={() => fileInputRef.current?.click()}
               />
             </Grid>
             <Grid item xs={4} sx={{ paddingLeft: 2, paddingTop: 1 }}>

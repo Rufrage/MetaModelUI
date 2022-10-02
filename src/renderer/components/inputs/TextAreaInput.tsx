@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { TextField } from '@mui/material';
 import { Control, Controller } from 'react-hook-form';
 
@@ -7,6 +8,8 @@ export interface TextAreaInputProps {
   control: Control;
   defaultValue?: string;
   disabled?: boolean;
+  helperText?: string;
+  errorText?: string;
 }
 export default function TextAreaInput({
   name,
@@ -14,6 +17,8 @@ export default function TextAreaInput({
   control,
   defaultValue = '',
   disabled = false,
+  helperText = ' ',
+  errorText = '',
 }: TextAreaInputProps) {
   return (
     <Controller
@@ -37,7 +42,13 @@ export default function TextAreaInput({
             fullWidth
             minRows={3}
             label={label}
-            helperText={error?.message ? error.message : ' '}
+            helperText={
+              error?.message
+                ? error.message
+                : errorText.length
+                ? errorText
+                : helperText
+            }
             disabled={disabled}
           />
         );
