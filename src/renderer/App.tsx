@@ -1,23 +1,25 @@
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import 'renderer/App.css';
 import NavigationFrame from 'renderer/components/navigation/NavigationFrame';
 import AuthProvider from 'renderer/providers/AuthProvider';
 import ObjectsProvider from 'renderer/providers/ObjectsProvider';
+import TemplatesProvider from 'renderer/providers/TemplatesProvider';
+import ViewsProvider from 'renderer/providers/ViewsProvider';
 import LoginScreen from 'renderer/screens/auth/LoginScreen';
 import RegisterScreen from 'renderer/screens/auth/RegisterScreen';
+import GenerateListScreen from 'renderer/screens/generate/GenerateListScreen';
+import GenerateScreen from 'renderer/screens/generate/GenerateScreen';
 import HomeScreen from 'renderer/screens/home/HomeScreen';
 import ObjectFormScreen from 'renderer/screens/object/ObjectFormScreen';
 import ObjectListScreen from 'renderer/screens/object/ObjectListScreen';
 import ObjectScreen from 'renderer/screens/object/ObjectScreen';
-import './App.css';
-import TemplatesProvider from './providers/TemplatesProvider';
-import ViewsProvider from './providers/ViewsProvider';
-import TemplateFormScreen from './screens/template/TemplateFormScreen';
-import TemplateListScreen from './screens/template/TemplateListScreen';
-import TemplateScreen from './screens/template/TemplateScreen';
-import ViewFormScreen from './screens/view/ViewFormScreen';
-import ViewListScreen from './screens/view/ViewListScreen';
-import ViewScreen from './screens/view/ViewScreen';
+import TemplateFormScreen from 'renderer/screens/template/TemplateFormScreen';
+import TemplateListScreen from 'renderer/screens/template/TemplateListScreen';
+import TemplateScreen from 'renderer/screens/template/TemplateScreen';
+import ViewFormScreen from 'renderer/screens/view/ViewFormScreen';
+import ViewListScreen from 'renderer/screens/view/ViewListScreen';
+import ViewScreen from 'renderer/screens/view/ViewScreen';
 
 const themes = {
   light: createTheme(),
@@ -54,6 +56,9 @@ export default function App() {
                     <Route path="/templates/" element={<TemplateScreen />}>
                       <Route index element={<TemplateListScreen />} />
                       <Route path=":id" element={<TemplateFormScreen />} />
+                    </Route>
+                    <Route path="/generate/" element={<GenerateScreen />}>
+                      <Route index element={<GenerateListScreen />} />
                     </Route>
                   </Route>
                   <Route

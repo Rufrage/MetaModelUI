@@ -7,7 +7,7 @@ import ScreenFrame from 'renderer/components/navigation/ScreenFrame';
 import TemplateTable from 'renderer/components/tables/TemplateTable';
 import { TemplatesContext } from 'renderer/providers/TemplatesProvider';
 
-export default function TemplateListScreen() {
+export default function GenerateListScreen() {
   const { templates } = useContext(TemplatesContext);
   const [filters, setFilters] = useState<TemplateFilterQuery[]>([]);
   const [templatesFiltered, setTemplatesFiltered] = useState<MMTemplate[]>([]);
@@ -30,11 +30,13 @@ export default function TemplateListScreen() {
   }, [filters, templates]);
 
   return (
-    <ScreenFrame name="Templates">
+    <ScreenFrame name="Generate">
       <TemplateFilter filters={filters} setFilters={setFilters} />
       <TemplateTable
         templatesFiltered={templatesFiltered}
-        withDescription={false}
+        withInsert={false}
+        withEdit={false}
+        withFilepath={false}
       />
     </ScreenFrame>
   );

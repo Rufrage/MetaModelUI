@@ -3,6 +3,7 @@ import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
+import TransformOutlinedIcon from '@mui/icons-material/TransformOutlined';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {
   Button,
@@ -39,6 +40,10 @@ const Navigation = () => {
   useHotkeys('T', (event) => {
     event.preventDefault();
     navigate('/templates/');
+  });
+  useHotkeys('G', (event) => {
+    event.preventDefault();
+    navigate('/generate/');
   });
   useHotkeys('L', (event) => {
     event.preventDefault();
@@ -113,6 +118,12 @@ const Navigation = () => {
                         label="Templates"
                         hotkey="T"
                         icon={<TextSnippetIcon fontSize="small" />}
+                      />
+                      <MenuListItem
+                        route="/generate/"
+                        label="Generate"
+                        hotkey="G"
+                        icon={<TransformOutlinedIcon fontSize="small" />}
                       />
                     </MenuList>
                   </>
