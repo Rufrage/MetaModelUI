@@ -24,9 +24,12 @@ import { TemplatesContext } from 'renderer/providers/TemplatesProvider';
 
 interface TemplateTableProps {
   templatesFiltered: MMTemplate[];
+
+  // Available Actions
   withInsert?: boolean;
   withEdit?: boolean;
 
+  // Available Columns
   withName?: boolean;
   withDescription?: boolean;
   withFilepath?: boolean;
@@ -41,7 +44,9 @@ export default function TemplateTable({
   withFilepath = true,
 }: TemplateTableProps) {
   const navigate = useNavigate();
-  useHotkeys('ctrl+N', () => navigate('/templates/new'));
+  useHotkeys('ctrl+N', () => {
+    if (withInsert) navigate('/templates/new');
+  });
 
   const { readTemplates } = useContext(TemplatesContext);
 

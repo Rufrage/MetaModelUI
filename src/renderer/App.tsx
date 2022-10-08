@@ -20,6 +20,7 @@ import TemplateScreen from 'renderer/screens/template/TemplateScreen';
 import ViewFormScreen from 'renderer/screens/view/ViewFormScreen';
 import ViewListScreen from 'renderer/screens/view/ViewListScreen';
 import ViewScreen from 'renderer/screens/view/ViewScreen';
+import BuildProfilesProvider from './providers/BuildProfileProvider';
 
 const themes = {
   light: createTheme(),
@@ -33,49 +34,51 @@ export default function App() {
     <ThemeProvider theme={themes.dark}>
       <CssBaseline />
       <AuthProvider>
-        <TemplatesProvider>
-          <ViewsProvider>
-            <ObjectsProvider>
-              <MemoryRouter>
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      <NavigationFrame routesProtected loginPath="/auth" />
-                    }
-                  >
-                    <Route index element={<HomeScreen />} />
-                    <Route path="/objects/" element={<ObjectScreen />}>
-                      <Route index element={<ObjectListScreen />} />
-                      <Route path=":id" element={<ObjectFormScreen />} />
-                    </Route>
-                    <Route path="/views/" element={<ViewScreen />}>
-                      <Route index element={<ViewListScreen />} />
-                      <Route path=":id" element={<ViewFormScreen />} />
-                    </Route>
-                    <Route path="/templates/" element={<TemplateScreen />}>
-                      <Route index element={<TemplateListScreen />} />
-                      <Route path=":id" element={<TemplateFormScreen />} />
-                    </Route>
-                    <Route path="/generate/" element={<GenerateScreen />}>
-                      <Route index element={<GenerateListScreen />} />
-                    </Route>
-                  </Route>
-                  <Route
-                    path="/auth/"
-                    element={<NavigationFrame basePath="/" />}
-                  >
-                    <Route index element={<LoginScreen />} />
+        <BuildProfilesProvider>
+          <TemplatesProvider>
+            <ViewsProvider>
+              <ObjectsProvider>
+                <MemoryRouter>
+                  <Routes>
                     <Route
-                      path="/auth/register/"
-                      element={<RegisterScreen />}
-                    />
-                  </Route>
-                </Routes>
-              </MemoryRouter>
-            </ObjectsProvider>
-          </ViewsProvider>
-        </TemplatesProvider>
+                      path="/"
+                      element={
+                        <NavigationFrame routesProtected loginPath="/auth" />
+                      }
+                    >
+                      <Route index element={<HomeScreen />} />
+                      <Route path="/objects/" element={<ObjectScreen />}>
+                        <Route index element={<ObjectListScreen />} />
+                        <Route path=":id" element={<ObjectFormScreen />} />
+                      </Route>
+                      <Route path="/views/" element={<ViewScreen />}>
+                        <Route index element={<ViewListScreen />} />
+                        <Route path=":id" element={<ViewFormScreen />} />
+                      </Route>
+                      <Route path="/templates/" element={<TemplateScreen />}>
+                        <Route index element={<TemplateListScreen />} />
+                        <Route path=":id" element={<TemplateFormScreen />} />
+                      </Route>
+                      <Route path="/generate/" element={<GenerateScreen />}>
+                        <Route index element={<GenerateListScreen />} />
+                      </Route>
+                    </Route>
+                    <Route
+                      path="/auth/"
+                      element={<NavigationFrame basePath="/" />}
+                    >
+                      <Route index element={<LoginScreen />} />
+                      <Route
+                        path="/auth/register/"
+                        element={<RegisterScreen />}
+                      />
+                    </Route>
+                  </Routes>
+                </MemoryRouter>
+              </ObjectsProvider>
+            </ViewsProvider>
+          </TemplatesProvider>
+        </BuildProfilesProvider>
       </AuthProvider>
     </ThemeProvider>
   );
