@@ -2,11 +2,11 @@ import { MMBuildProfile } from '@rufrage/metamodel';
 import { useContext, useEffect, useState } from 'react';
 import BuildProfileFilter from 'renderer/components/filters/BuildProfileFilter';
 import ScreenFrame from 'renderer/components/navigation/ScreenFrame';
+import BuildProfileTemplateTable from 'renderer/components/tables/BuildProfileTemplateTable';
 import { BuildProfilesContext } from 'renderer/providers/BuildProfileProvider';
 import { TemplatesContext } from 'renderer/providers/TemplatesProvider';
 
 export default function GenerateListScreen() {
-  const { templates } = useContext(TemplatesContext);
   const { readBuildProfile } = useContext(BuildProfilesContext);
 
   const [selectedBuildProfile, setSelectedBuildProfile] = useState('-');
@@ -23,7 +23,6 @@ export default function GenerateListScreen() {
           true
         );
         setBuildProfile(tmpReadBuildProfile);
-        console.log('tmpReadBuildProfile: ', tmpReadBuildProfile);
       };
       fetchReadBuildProfile();
     }
@@ -35,6 +34,7 @@ export default function GenerateListScreen() {
         selectedBuildProfile={selectedBuildProfile}
         setSelectedBuildProfile={setSelectedBuildProfile}
       />
+      <BuildProfileTemplateTable buildProfile={buildProfile} />
     </ScreenFrame>
   );
 }
