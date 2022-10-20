@@ -55,14 +55,12 @@ async function addObject(docData: MMObject): Promise<MMObject> {
 }
 
 async function saveObject(docData: MMObject): Promise<MMObject> {
-  console.log('Updating ', docData);
   if (docData.id) {
     try {
       const updatedDoc = await updateDoc(getObjectRef(docData.id), {
         name: docData.name,
         description: docData.description,
       });
-      console.log('Updated successfully: ', docData);
     } catch (error) {
       console.log('Error: ', error);
     }

@@ -8,7 +8,6 @@ import {
   Paper,
   TableCell,
   TableRow,
-  Typography,
 } from '@mui/material';
 import {
   MMBuildProfileEntry,
@@ -38,12 +37,10 @@ export default function TemplateRow({
   const [open, setOpen] = useState<boolean>(false);
 
   const setSelectedObjects = (newSelectedObjects: string[]) => {
-    console.log('New selected objects: ', newSelectedObjects);
     buildProfileEntry.objectIDs = newSelectedObjects;
     updateBuildProfileEntry(buildProfileEntry.templateID, buildProfileEntry);
   };
   const setSelectedViews = (newSelectedViews: string[]) => {
-    console.log('New selected views: ', newSelectedViews);
     buildProfileEntry.viewIDs = newSelectedViews;
     updateBuildProfileEntry(buildProfileEntry.templateID, buildProfileEntry);
   };
