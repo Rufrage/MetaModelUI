@@ -135,7 +135,6 @@ export default function TransferList({
       <Divider />
       <List
         sx={{
-          width: 300,
           height: 230,
           bgcolor: 'background.paper',
           overflow: 'auto',
@@ -182,8 +181,10 @@ export default function TransferList({
 
   return (
     <Grid container spacing={2} justifyContent="center" alignItems="center">
-      <Grid item>{customList('Choices', left)}</Grid>
-      <Grid item>
+      <Grid item xs={12} lg={5}>
+        {customList('Choices', left)}
+      </Grid>
+      <Grid item xs={12} lg={2}>
         <Grid container direction="column" alignItems="center">
           <Button
             sx={{ my: 0.5 }}
@@ -207,7 +208,9 @@ export default function TransferList({
           </Button>
         </Grid>
       </Grid>
-      <Grid item>{customList('Chosen', selectedLst)}</Grid>
+      <Grid item xs={12} lg={5}>
+        {customList('Chosen', selectedLst)}
+      </Grid>
     </Grid>
   );
 }

@@ -2,6 +2,7 @@ import { AutoAwesomeMosaicOutlined } from '@mui/icons-material';
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import {
   Badge,
+  Checkbox,
   Collapse,
   Grid,
   IconButton,
@@ -44,6 +45,10 @@ export default function TemplateRow({
     buildProfileEntry.viewIDs = newSelectedViews;
     updateBuildProfileEntry(buildProfileEntry.templateID, buildProfileEntry);
   };
+  const toggleActive = () => {
+    buildProfileEntry.active = !buildProfileEntry.active;
+    updateBuildProfileEntry(buildProfileEntry.templateID, buildProfileEntry);
+  };
 
   return (
     <Fragment key={`${template.name}_wrapper`}>
@@ -52,14 +57,8 @@ export default function TemplateRow({
         sx={{ '& > *': { borderBottom: 'unset' } }}
         selected={buildProfileEntry.active}
       >
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+        <TableCell align="left">
+          <Checkbox onClick={toggleActive} checked={buildProfileEntry.active} />
         </TableCell>
         <TableCell component="th" scope="row">
           {template.name}
@@ -95,6 +94,15 @@ export default function TemplateRow({
               </Grid>
             )}
           </Grid>
+        </TableCell>
+        <TableCell align="right">
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
         </TableCell>
       </TableRow>
       <TableRow key={`${template.name}_collapse`}>

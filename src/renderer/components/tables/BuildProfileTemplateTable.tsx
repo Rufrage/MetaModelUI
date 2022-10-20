@@ -1,5 +1,6 @@
 import {
   Card,
+  Checkbox,
   Grid,
   Table,
   TableBody,
@@ -43,6 +44,36 @@ export default function BuildProfileTemplateTable({
     setTemplateMap(tmpTemplateMap);
   }, [templates]);
 
+  const numberOfChecked = (entries: Map<string, MMBuildProfileEntry>) => {
+    let amountChecked = 0;
+    Array.from(entries.values()).reduce((_result, entry) => {
+      if (entry.active) {
+        amountChecked += 1;
+      }
+      return amountChecked;
+    }, amountChecked);
+    return amountChecked;
+  };
+
+  const handleToggleAll = () => {
+    const amountChecked = numberOfChecked(buildProfileEntries);
+    if (amountChecked === buildProfileEntries.size) {
+      buildProfileEntries.forEach((entry) => {
+        if (entry.active) {
+          entry.active = false;
+          updateBuildProfileEntry(entry.templateID, entry);
+        }
+      });
+    } else {
+      buildProfileEntries.forEach((entry) => {
+        if (!entry.active) {
+          entry.active = true;
+          updateBuildProfileEntry(entry.templateID, entry);
+        }
+      });
+    }
+  };
+
   return (
     <Card elevation={2} sx={{ padding: 2, marginTop: 2 }}>
       <Typography variant="h6">Templates</Typography>
@@ -52,9 +83,24 @@ export default function BuildProfileTemplateTable({
             <Table aria-label="Templates table">
               <TableHead>
                 <TableRow>
-                  <TableCell width={10} />
+                  <TableCell width={5}>
+                    <Checkbox
+                      onClick={handleToggleAll}
+                      checked={
+                        numberOfChecked(buildProfileEntries) ===
+                          buildProfileEntries.size &&
+                        buildProfileEntries.size !== 0
+                      }
+                      indeterminate={
+                        numberOfChecked(buildProfileEntries) !==
+                          buildProfileEntries.size &&
+                        numberOfChecked(buildProfileEntries) !== 0
+                      }
+                    />
+                  </TableCell>
                   <TableCell width={200}>Name</TableCell>
                   <TableCell width={200}>Inputs</TableCell>
+                  <TableCell width={10} />
                 </TableRow>
               </TableHead>
               <TableBody>

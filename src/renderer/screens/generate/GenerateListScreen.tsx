@@ -116,6 +116,7 @@ export default function GenerateListScreen() {
       return newSelectedObjects;
     });
   };
+
   const updateSelectedViews = (newSelectedViews: string[]) => {
     setSelectedViews((currentSelectedViews) => {
       if (newSelectedViews.length > currentSelectedViews.length) {
