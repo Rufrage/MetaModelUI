@@ -9,7 +9,11 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { MMBuildProfile, MMTemplate } from '@rufrage/metamodel';
+import {
+  MMBuildProfile,
+  MMBuildProfileEntry,
+  MMTemplate,
+} from '@rufrage/metamodel';
 import { useContext, useEffect, useState } from 'react';
 import { TemplatesContext } from 'renderer/providers/TemplatesProvider';
 import TemplateRow from './BuildProfileTemplateTable/TemplateRow';
@@ -22,23 +26,52 @@ export default function BuildProfileTemplateTable({
   buildProfile,
 }: BuildProfileTemplateTableProps) {
   const { templates } = useContext(TemplatesContext);
-  const [selectedTemplates, setSelectedTemplates] = useState<string[]>([]);
+  const [templateMap, setTemplateMap] = useState<Map<string, MMTemplate>>(
+    new Map()
+  );
+  const [buildProfileEntries, setBuildProfileEntries] = useState<
+    Map<string, MMBuildProfileEntry>
+  >(new Map());
 
   useEffect(() => {
-    if (buildProfile) {
-      const tmpSelectedTemplates: string[] = [];
-      buildProfile.buildProfileEntries?.forEach((buildProfileEntry) => {
-        if (buildProfileEntry && buildProfileEntry.templateID) {
-          tmpSelectedTemplates.push(buildProfileEntry.templateID);
-        }
-      });
-      setSelectedTemplates(tmpSelectedTemplates);
-    }
-  }, [buildProfile]);
+    // Store templates in id-indexed map for easier access
+    const tmpTemplateMap = new Map<string, MMTemplate>();
+    templates.reduce((result, template) => {
+      if (template.id) {
+        tmpTemplateMap.set(template.id, template);
+      }
+      return result;
+    }, tmpTemplateMap);
+    setTemplateMap(tmpTemplateMap);
+  }, [templates]);
 
-  const isTemplateSelected = (template: MMTemplate) => {
-    return template && template.id && selectedTemplates?.includes(template.id);
-  };
+  useEffect(() => {
+    // The build profile entries will be constructed from already selected templates and extended by all remaining templates
+    const tmpBuildProfileEntries: Map<string, MMBuildProfileEntry> = new Map();
+    // First, if a buildProfile is selected, we add all of its entries
+    if (buildProfile) {
+      buildProfile.buildProfileEntries.forEach((entry) => {
+        tmpBuildProfileEntries.set(entry.templateID, entry);
+      });
+    }
+    // Next, we check each template and if it is not yet included, we add a new inactive build profile entry for it
+    templates.reduce((result, template) => {
+      if (template.id && !result.has(template.id)) {
+        result.set(
+          template.id,
+          new MMBuildProfileEntry(
+            '',
+            '',
+            buildProfile?.id ? buildProfile.id : '',
+            template.id,
+            false
+          )
+        );
+      }
+      return result;
+    }, tmpBuildProfileEntries);
+    setBuildProfileEntries(tmpBuildProfileEntries);
+  }, [buildProfile, templates]);
 
   return (
     <Card elevation={2} sx={{ padding: 2, marginTop: 2 }}>
@@ -55,15 +88,16 @@ export default function BuildProfileTemplateTable({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {buildProfile &&
-                  templates.filter(isTemplateSelected).map((template) => {
-                    return <TemplateRow template={template} selected />;
-                  })}
-                {templates
-                  .filter((template) => !isTemplateSelected(template))
-                  .map((template) => {
-                    return <TemplateRow template={template} />;
-                  })}
+                {Array.from(buildProfileEntries).map(
+                  ([templateId, buildProfileEntry]) => {
+                    return (
+                      <TemplateRow
+                        buildProfileEntry={buildProfileEntry}
+                        template={templateMap.get(templateId)}
+                      />
+                    );
+                  }
+                )}
               </TableBody>
             </Table>
           </TableContainer>

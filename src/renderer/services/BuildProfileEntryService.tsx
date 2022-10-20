@@ -20,6 +20,7 @@ const buildProfileEntryConverter: FirestoreDataConverter<MMBuildProfileEntry> =
         description: buildProfileEntry.description,
         buildProfileID: buildProfileEntry.buildProfileID,
         templateID: buildProfileEntry.templateID,
+        active: buildProfileEntry.active,
         objectIDs: buildProfileEntry.objectIDs,
         viewIDs: buildProfileEntry.viewIDs,
       };
@@ -31,6 +32,7 @@ const buildProfileEntryConverter: FirestoreDataConverter<MMBuildProfileEntry> =
         data.description,
         data.buildProfileEntry,
         data.templateID,
+        data.active,
         snapshot.id
       );
       newBuildProfile.objectIDs = data.objectIDs;
@@ -109,6 +111,7 @@ async function saveBuildProfileEntry(
           description: docData.description,
           buildProfileID: docData.buildProfileID,
           templateID: docData.templateID,
+          active: docData.active,
           objectIDs: docData.objectIDs,
           viewIDs: docData.viewIDs,
         }

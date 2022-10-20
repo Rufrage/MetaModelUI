@@ -27,7 +27,6 @@ export default function ObjectTable({ objectsFiltered }: ObjectTableProps) {
   useHotkeys('ctrl+N', () => navigate('/objects/new'));
 
   const { readObjects } = useContext(ObjectsContext);
-  const [objectsLoading, setObjectsLoading] = useState(false);
 
   return (
     <Card elevation={2} sx={{ padding: 2, marginTop: 2 }}>

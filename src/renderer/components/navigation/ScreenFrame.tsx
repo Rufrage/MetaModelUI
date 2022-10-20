@@ -7,18 +7,26 @@ interface ScreenFrameProps {
 
 export default function ScreenFrame({ name, children }: ScreenFrameProps) {
   return (
-    <Container>
-      <Grid container>
-        <Grid item xs={12} pt={2}>
+    <Container sx={{ height: '100%' }}>
+      <Grid container direction="column" sx={{ height: '100%' }}>
+        <Grid item padding={2}>
           <Paper elevation={1} sx={{ padding: 2 }}>
             <Typography variant="h6">{name}</Typography>
           </Paper>
         </Grid>
-      </Grid>
-      <Grid item xs={12} pt={2}>
-        <Paper elevation={1} sx={{ padding: 2 }}>
-          {children}
-        </Paper>
+        <Grid item xs padding={2}>
+          <Paper
+            elevation={1}
+            sx={{
+              padding: 2,
+              minHeight: '100%',
+              maxHeight: '250px',
+              overflow: 'auto',
+            }}
+          >
+            {children}
+          </Paper>
+        </Grid>
       </Grid>
     </Container>
   );

@@ -20,13 +20,15 @@ const buildProfileConverter: FirestoreDataConverter<MMBuildProfile> = {
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
-    console.log('fromFirestore called');
     const data = snapshot.data();
     const newBuildProfile = new MMBuildProfile(
       data.name,
       data.description,
       snapshot.id
     );
+    if (data.objectIDs) {
+      newBuildProfile.objectIDs = data.objectIDs;
+    }
 
     return newBuildProfile;
   },
