@@ -101,9 +101,9 @@ export default function TemplateRow({
         </TableCell>
       </TableRow>
       <TableRow key={`${template.name}_collapse`}>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell style={{ padding: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Paper elevation={1} sx={{ margin: 1, padding: 2 }}>
+            <Paper elevation={1} sx={{ padding: 2 }}>
               <BuildProfileTransferList
                 title="Template Specific Input"
                 selectedObjects={buildProfileEntry.objectIDs}
