@@ -5,32 +5,28 @@ import { Card, Grid, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import { MMBuildProfile } from '@rufrage/metamodel';
-import { SyntheticEvent, useContext, useEffect, useState } from 'react';
+import { SyntheticEvent, useContext, useState } from 'react';
 import { ObjectsContext } from 'renderer/providers/ObjectsProvider';
 import { ViewsContext } from 'renderer/providers/ViewsProvider';
 import TransferList from './TransferList';
 
 interface BuildProfileTransferListProps {
-  buildProfile: MMBuildProfile | undefined;
+  title: string;
+  selectedObjects: string[];
+  setSelectedObjects: (newSelectedObjects: string[]) => void;
+  selectedViews: string[];
+  setSelectedViews: (newSelectedViews: string[]) => void;
 }
 
 export default function BuildProfileTransferList({
-  buildProfile,
+  title,
+  selectedObjects,
+  setSelectedObjects,
+  selectedViews,
+  setSelectedViews,
 }: BuildProfileTransferListProps) {
   const { objects } = useContext(ObjectsContext);
   const { views } = useContext(ViewsContext);
-  const [selectedObjects, setSelectedObjects] = useState<string[]>([]);
-  const [selectedViews, setSelectedViews] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (buildProfile) {
-      setSelectedObjects(buildProfile.objectIDs);
-      setSelectedViews(buildProfile.viewIDs);
-    } else {
-      setSelectedObjects([]);
-      setSelectedViews([]);
-    }
-  }, [buildProfile]);
 
   const [selectedTab, setSelectedTab] = useState('1');
   const handleChange = (_event: SyntheticEvent, newValue: string) => {
@@ -39,7 +35,7 @@ export default function BuildProfileTransferList({
 
   return (
     <Card elevation={2} sx={{ padding: 2, marginTop: 2 }}>
-      <Typography variant="h6">General Inputs</Typography>
+      <Typography variant="h6">{title}</Typography>
       <Grid container sx={{ paddingTop: 2 }}>
         <Box sx={{ width: '100%', typography: 'body1' }}>
           <TabContext value={selectedTab}>

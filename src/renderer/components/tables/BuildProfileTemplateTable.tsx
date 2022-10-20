@@ -33,6 +33,15 @@ export default function BuildProfileTemplateTable({
     Map<string, MMBuildProfileEntry>
   >(new Map());
 
+  const updateBuildProfileEntry = (
+    templateId: string,
+    newBuildProfileEntry: MMBuildProfileEntry
+  ) => {
+    const newBuildProfileEntries = new Map(buildProfileEntries);
+    newBuildProfileEntries.set(templateId, newBuildProfileEntry);
+    setBuildProfileEntries(newBuildProfileEntries);
+  };
+
   useEffect(() => {
     // Store templates in id-indexed map for easier access
     const tmpTemplateMap = new Map<string, MMTemplate>();
@@ -92,6 +101,8 @@ export default function BuildProfileTemplateTable({
                   ([templateId, buildProfileEntry]) => {
                     return (
                       <TemplateRow
+                        key={`${templateId}_row`}
+                        updateBuildProfileEntry={updateBuildProfileEntry}
                         buildProfileEntry={buildProfileEntry}
                         template={templateMap.get(templateId)}
                       />

@@ -12,6 +12,9 @@ export default function GenerateListScreen() {
   const [selectedBuildProfile, setSelectedBuildProfile] = useState('-');
   const [buildProfile, setBuildProfile] = useState<MMBuildProfile>();
 
+  const [selectedObjects, setSelectedObjects] = useState<string[]>([]);
+  const [selectedViews, setSelectedViews] = useState<string[]>([]);
+
   useEffect(() => {
     if (selectedBuildProfile === '-') {
       setBuildProfile(undefined);
@@ -22,12 +25,21 @@ export default function GenerateListScreen() {
           selectedBuildProfile,
           true
         );
-        console.log(tmpReadBuildProfile);
         setBuildProfile(tmpReadBuildProfile);
       };
       fetchReadBuildProfile();
     }
   }, [readBuildProfile, selectedBuildProfile]);
+
+  useEffect(() => {
+    if (buildProfile) {
+      setSelectedObjects(buildProfile.objectIDs);
+      setSelectedViews(buildProfile.viewIDs);
+    } else {
+      setSelectedObjects([]);
+      setSelectedViews([]);
+    }
+  }, [buildProfile]);
 
   return (
     <ScreenFrame name="Generate">
@@ -35,7 +47,13 @@ export default function GenerateListScreen() {
         selectedBuildProfile={selectedBuildProfile}
         setSelectedBuildProfile={setSelectedBuildProfile}
       />
-      <BuildProfileTransferList buildProfile={buildProfile} />
+      <BuildProfileTransferList
+        title="General Input"
+        selectedObjects={selectedObjects}
+        selectedViews={selectedViews}
+        setSelectedObjects={setSelectedObjects}
+        setSelectedViews={setSelectedViews}
+      />
       <BuildProfileTemplateTable buildProfile={buildProfile} />
     </ScreenFrame>
   );

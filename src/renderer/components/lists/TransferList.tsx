@@ -27,7 +27,7 @@ function union(a: readonly string[], b: readonly string[]) {
 interface TransferListProps {
   dataLst: MMEntity[];
   selectedLst: string[];
-  setSelectedLst: Dispatch<SetStateAction<string[]>>;
+  setSelectedLst: (newSelectedData: string[]) => void;
 }
 
 export default function TransferList({
@@ -135,7 +135,7 @@ export default function TransferList({
       <Divider />
       <List
         sx={{
-          width: 400,
+          width: 300,
           height: 230,
           bgcolor: 'background.paper',
           overflow: 'auto',

@@ -5,6 +5,7 @@ import {
   Collapse,
   Grid,
   IconButton,
+  Paper,
   TableCell,
   TableRow,
   Typography,
@@ -14,25 +15,46 @@ import {
   MMTemplate,
   MMTemplateInputType,
 } from '@rufrage/metamodel';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import BuildProfileTransferList from 'renderer/components/lists/BuildProfileTransferList';
 
 interface TemplateRowProps {
   buildProfileEntry: MMBuildProfileEntry;
+  updateBuildProfileEntry: (
+    templateId: string,
+    newBuildProfileEntry: MMBuildProfileEntry
+  ) => void;
   template?: MMTemplate;
 }
 
 export default function TemplateRow({
   buildProfileEntry,
+  updateBuildProfileEntry,
   template = new MMTemplate('', ''),
 }: TemplateRowProps) {
   const [open, setOpen] = useState<boolean>(false);
 
+  const setSelectedObjects = (newSelectedObjects: string[]) => {
+    console.log('New selected objects: ', newSelectedObjects);
+    buildProfileEntry.objectIDs = newSelectedObjects;
+    updateBuildProfileEntry(buildProfileEntry.templateID, buildProfileEntry);
+  };
+  const setSelectedViews = (newSelectedViews: string[]) => {
+    console.log('New selected views: ', newSelectedViews);
+    buildProfileEntry.viewIDs = newSelectedViews;
+    updateBuildProfileEntry(buildProfileEntry.templateID, buildProfileEntry);
+  };
+
   return (
-    <>
-      <TableRow key={template.name} sx={{ '& > *': { borderBottom: 'unset' } }}>
+    <Fragment key={`${template.name}_wrapper`}>
+      <TableRow
+        key={template.name}
+        sx={{ '& > *': { borderBottom: 'unset' } }}
+        selected={buildProfileEntry.active}
+      >
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -81,10 +103,18 @@ export default function TemplateRow({
       <TableRow key={`${template.name}_collapse`}>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Typography variant="body1">Test</Typography>
+            <Paper elevation={1} sx={{ margin: 1, padding: 2 }}>
+              <BuildProfileTransferList
+                title="Template Specific Input"
+                selectedObjects={buildProfileEntry.objectIDs}
+                selectedViews={buildProfileEntry.viewIDs}
+                setSelectedObjects={setSelectedObjects}
+                setSelectedViews={setSelectedViews}
+              />
+            </Paper>
           </Collapse>
         </TableCell>
       </TableRow>
-    </>
+    </Fragment>
   );
 }
