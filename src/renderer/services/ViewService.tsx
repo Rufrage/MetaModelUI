@@ -55,14 +55,12 @@ async function addView(docData: MMView): Promise<MMView> {
 }
 
 async function saveView(docData: MMView): Promise<MMView> {
-  console.log('Updating ', docData);
   if (docData.id) {
     try {
       const updatedDoc = await updateDoc(getViewRef(docData.id), {
         name: docData.name,
         description: docData.description,
       });
-      console.log('Updated successfully: ', docData);
     } catch (error) {
       console.log('Error: ', error);
     }

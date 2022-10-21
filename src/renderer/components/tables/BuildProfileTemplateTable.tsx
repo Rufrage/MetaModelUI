@@ -12,22 +12,15 @@ import {
 } from '@mui/material';
 import { MMBuildProfileEntry, MMTemplate } from '@rufrage/metamodel';
 import { useContext, useEffect, useState } from 'react';
+import { GenerateContext } from 'renderer/providers/GenerateProvider';
 import { TemplatesContext } from 'renderer/providers/TemplatesProvider';
 import TemplateRow from './BuildProfileTemplateTable/TemplateRow';
 
-interface BuildProfileTemplateTableProps {
-  buildProfileEntries: Map<string, MMBuildProfileEntry>;
-  updateBuildProfileEntry: (
-    templateId: string,
-    newBuildProfileEntry: MMBuildProfileEntry
-  ) => void;
-}
-
-export default function BuildProfileTemplateTable({
-  buildProfileEntries,
-  updateBuildProfileEntry,
-}: BuildProfileTemplateTableProps) {
+export default function BuildProfileTemplateTable() {
   const { templates } = useContext(TemplatesContext);
+  const { modifiedBuildProfileEntries, updateBuildProfileEntry } =
+    useContext(GenerateContext);
+
   const [templateMap, setTemplateMap] = useState<Map<string, MMTemplate>>(
     new Map()
   );
@@ -56,16 +49,16 @@ export default function BuildProfileTemplateTable({
   };
 
   const handleToggleAll = () => {
-    const amountChecked = numberOfChecked(buildProfileEntries);
-    if (amountChecked === buildProfileEntries.size) {
-      buildProfileEntries.forEach((entry) => {
+    const amountChecked = numberOfChecked(modifiedBuildProfileEntries);
+    if (amountChecked === modifiedBuildProfileEntries.size) {
+      modifiedBuildProfileEntries.forEach((entry) => {
         if (entry.active) {
           entry.active = false;
           updateBuildProfileEntry(entry.templateID, entry);
         }
       });
     } else {
-      buildProfileEntries.forEach((entry) => {
+      modifiedBuildProfileEntries.forEach((entry) => {
         if (!entry.active) {
           entry.active = true;
           updateBuildProfileEntry(entry.templateID, entry);
@@ -87,14 +80,14 @@ export default function BuildProfileTemplateTable({
                     <Checkbox
                       onClick={handleToggleAll}
                       checked={
-                        numberOfChecked(buildProfileEntries) ===
-                          buildProfileEntries.size &&
-                        buildProfileEntries.size !== 0
+                        numberOfChecked(modifiedBuildProfileEntries) ===
+                          modifiedBuildProfileEntries.size &&
+                        modifiedBuildProfileEntries.size !== 0
                       }
                       indeterminate={
-                        numberOfChecked(buildProfileEntries) !==
-                          buildProfileEntries.size &&
-                        numberOfChecked(buildProfileEntries) !== 0
+                        numberOfChecked(modifiedBuildProfileEntries) !==
+                          modifiedBuildProfileEntries.size &&
+                        numberOfChecked(modifiedBuildProfileEntries) !== 0
                       }
                     />
                   </TableCell>
@@ -104,12 +97,11 @@ export default function BuildProfileTemplateTable({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {Array.from(buildProfileEntries).map(
+                {Array.from(modifiedBuildProfileEntries).map(
                   ([templateId, buildProfileEntry]) => {
                     return (
                       <TemplateRow
                         key={`${templateId}_row`}
-                        updateBuildProfileEntry={updateBuildProfileEntry}
                         buildProfileEntry={buildProfileEntry}
                         template={templateMap.get(templateId)}
                       />

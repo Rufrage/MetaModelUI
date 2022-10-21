@@ -9,19 +9,14 @@ import {
   Select,
   Typography,
 } from '@mui/material';
-import { Dispatch, SetStateAction, useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { BuildProfilesContext } from 'renderer/providers/BuildProfileProvider';
+import { GenerateContext } from 'renderer/providers/GenerateProvider';
 
-interface BuildProfileFilterProps {
-  selectedBuildProfile: string;
-  setSelectedBuildProfile: Dispatch<SetStateAction<string>>;
-}
-
-export default function BuildProfileFilter({
-  selectedBuildProfile,
-  setSelectedBuildProfile,
-}: BuildProfileFilterProps) {
+export default function BuildProfileFilter() {
   const { buildProfiles, readBuildProfiles } = useContext(BuildProfilesContext);
+  const { selectedBuildProfile, setSelectedBuildProfile } =
+    useContext(GenerateContext);
 
   return (
     <Card elevation={2} sx={{ padding: 2 }}>

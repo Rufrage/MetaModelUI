@@ -18,7 +18,6 @@ export type ViewsContextContent = {
 export const ViewsContext = createContext<ViewsContextContent>({
   views: [],
   insertView: () => {
-    console.log('insertView Default called.');
     return new Promise((resolve) => resolve(undefined));
   },
   updateView: () => {
@@ -60,7 +59,6 @@ export default function ViewsProvider({ children }: ViewsProviderProps) {
   }
 
   async function insertView(newView: MMView): Promise<MMView | undefined> {
-    console.log('insert View implemented called.');
     try {
       const addedView = await addView(newView);
       await readViews();

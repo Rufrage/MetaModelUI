@@ -4,7 +4,6 @@ import TabPanel from '@mui/lab/TabPanel';
 import { Card, Grid, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
-import { MMBuildProfile } from '@rufrage/metamodel';
 import { SyntheticEvent, useContext, useState } from 'react';
 import { ObjectsContext } from 'renderer/providers/ObjectsProvider';
 import { ViewsContext } from 'renderer/providers/ViewsProvider';
@@ -13,16 +12,16 @@ import TransferList from './TransferList';
 interface BuildProfileTransferListProps {
   title: string;
   selectedObjects: string[];
-  setSelectedObjects: (newSelectedObjects: string[]) => void;
   selectedViews: string[];
+  setSelectedObjects: (newSelectedObjects: string[]) => void;
   setSelectedViews: (newSelectedViews: string[]) => void;
 }
 
 export default function BuildProfileTransferList({
   title,
   selectedObjects,
-  setSelectedObjects,
   selectedViews,
+  setSelectedObjects,
   setSelectedViews,
 }: BuildProfileTransferListProps) {
   const { objects } = useContext(ObjectsContext);

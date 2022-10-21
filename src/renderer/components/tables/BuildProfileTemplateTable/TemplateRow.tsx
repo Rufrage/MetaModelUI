@@ -15,26 +15,24 @@ import {
   MMTemplate,
   MMTemplateInputType,
 } from '@rufrage/metamodel';
-import { Fragment, useState } from 'react';
+import { Fragment, useContext, useState } from 'react';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import BuildProfileTransferList from 'renderer/components/lists/BuildProfileTransferList';
+import { GenerateContext } from 'renderer/providers/GenerateProvider';
 
 interface TemplateRowProps {
   buildProfileEntry: MMBuildProfileEntry;
-  updateBuildProfileEntry: (
-    templateId: string,
-    newBuildProfileEntry: MMBuildProfileEntry
-  ) => void;
   template?: MMTemplate;
 }
 
 export default function TemplateRow({
   buildProfileEntry,
-  updateBuildProfileEntry,
   template = new MMTemplate('', ''),
 }: TemplateRowProps) {
+  const { updateBuildProfileEntry } = useContext(GenerateContext);
+
   const [open, setOpen] = useState<boolean>(false);
 
   const setSelectedObjects = (newSelectedObjects: string[]) => {
