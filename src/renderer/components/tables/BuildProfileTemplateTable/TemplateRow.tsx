@@ -9,6 +9,7 @@ import {
   Paper,
   TableCell,
   TableRow,
+  Tooltip,
 } from '@mui/material';
 import {
   MMBuildProfileEntry,
@@ -21,6 +22,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import BuildProfileTransferList from 'renderer/components/lists/BuildProfileTransferList';
 import { GenerateContext } from 'renderer/providers/GenerateProvider';
+import SyncDisabledIcon from '@mui/icons-material/SyncDisabled';
 
 interface TemplateRowProps {
   buildProfileEntry: MMBuildProfileEntry;
@@ -31,7 +33,8 @@ export default function TemplateRow({
   buildProfileEntry,
   template = new MMTemplate('', ''),
 }: TemplateRowProps) {
-  const { updateBuildProfileEntry } = useContext(GenerateContext);
+  const { updateBuildProfileEntry, outOfSyncBuildProfileEntries } =
+    useContext(GenerateContext);
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -89,6 +92,23 @@ export default function TemplateRow({
                 >
                   <AutoAwesomeMosaicOutlined />
                 </Badge>
+              </Grid>
+            )}
+          </Grid>
+        </TableCell>
+        <TableCell sx={{ width: 200, maxWidth: 200 }}>
+          <Grid container spacing={2}>
+            {outOfSyncBuildProfileEntries.includes(
+              buildProfileEntry.templateID
+            ) && (
+              <Grid item>
+                <Tooltip
+                  title="This template input is out of sync with the general input."
+                  placement="top"
+                  arrow
+                >
+                  <SyncDisabledIcon />
+                </Tooltip>
               </Grid>
             )}
           </Grid>

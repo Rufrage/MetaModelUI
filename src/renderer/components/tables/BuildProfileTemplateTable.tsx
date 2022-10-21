@@ -93,6 +93,7 @@ export default function BuildProfileTemplateTable() {
                   </TableCell>
                   <TableCell width={200}>Name</TableCell>
                   <TableCell width={200}>Inputs</TableCell>
+                  <TableCell width={200}>Status</TableCell>
                   <TableCell width={10} />
                 </TableRow>
               </TableHead>

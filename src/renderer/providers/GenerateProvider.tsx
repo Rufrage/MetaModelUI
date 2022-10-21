@@ -24,6 +24,8 @@ export type GenerateContextContent = {
   selectedObjects: string[];
   // The update function for the currently selected objects
   updateSelectedObjects: (newSelectedObjects: string[]) => void;
+  // Stores the templateIds for all BuildProfileEntries that are not in sync with the general inputs
+  outOfSyncBuildProfileEntries: string[];
   // The currently selected views from the general inputs
   selectedViews: string[];
   // The update function for the currently selected views
@@ -36,6 +38,7 @@ export const GenerateContext = createContext<GenerateContextContent>({
   currentBuildProfile: undefined,
   modifiedBuildProfileEntries: new Map(),
   updateBuildProfileEntry: () => {},
+  outOfSyncBuildProfileEntries: [],
   selectedObjects: [],
   updateSelectedObjects: () => {},
   selectedViews: [],
@@ -45,6 +48,20 @@ export const GenerateContext = createContext<GenerateContextContent>({
 interface GenerateProviderProps {
   children: JSX.Element | JSX.Element[];
 }
+
+// Compares the sorted, stringyfied selected Objects and Views of general and template specific input
+const isBuildProfileEntrySynced = (
+  buildProfileEntry: MMBuildProfileEntry,
+  selectedObjects: string[],
+  selectedViews: string[]
+) => {
+  return (
+    selectedObjects.sort().toString() ===
+      buildProfileEntry.objectIDs.sort().toString() &&
+    selectedViews.sort().toString() ===
+      buildProfileEntry.viewIDs.sort().toString()
+  );
+};
 
 export default function GenerateProvider({ children }: GenerateProviderProps) {
   const { readBuildProfile } = useContext(BuildProfilesContext);
@@ -56,6 +73,14 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
   >();
   const [modifiedBuildProfileEntries, setModifiedBuildProfileEntries] =
     useState<Map<string, MMBuildProfileEntry>>(new Map());
+
+  // Stores the templateIds for all BuildProfileEntries that have been modified and are flagged for saving
+  const [dirtyBuildProfileEntries, setDirtyBuildProfileEntries] = useState<
+    string[]
+  >([]);
+  // Stores the templateIds for all BuildProfileEntries that are not in sync with the general inputs
+  const [outOfSyncBuildProfileEntries, setOutOfSyncBuildProfileEntries] =
+    useState<string[]>([]);
 
   const [selectedObjects, setSelectedObjects] = useState<string[]>([]);
   const [selectedViews, setSelectedViews] = useState<string[]>([]);
@@ -88,19 +113,9 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
     }
   }, [currentBuildProfile]);
 
-  // Initializes / Updates the list of Objects/Views that are selected in the general input transfer list
+  // Constructs a "modified list" of build path entries. It is initialized from a build Profile and can be modified by the user.
+  // The build profile entries will be constructed from already selected templates and extended by all remaining templates.
   useEffect(() => {
-    if (currentBuildProfile) {
-      setSelectedObjects(currentBuildProfile.objectIDs);
-      setSelectedViews(currentBuildProfile.viewIDs);
-    } else {
-      setSelectedObjects([]);
-      setSelectedViews([]);
-    }
-  }, [currentBuildProfile]);
-
-  useEffect(() => {
-    // The build profile entries will be constructed from already selected templates and extended by all remaining templates
     const tmpBuildProfileEntries: Map<string, MMBuildProfileEntry> = new Map();
     // First, if a buildProfile is selected, we add all of its entries
     if (currentBuildProfile) {
@@ -124,17 +139,32 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
       }
       return result;
     }, tmpBuildProfileEntries);
+
     setModifiedBuildProfileEntries(tmpBuildProfileEntries);
   }, [currentBuildProfile, templates]);
+
+  // Checks whether a template is still in sync with the general input
+  useEffect(() => {
+    const tmpOutOfSyncBuildProfileEntries: string[] = [];
+    Array.from(modifiedBuildProfileEntries).forEach(([templateId, entry]) => {
+      if (!isBuildProfileEntrySynced(entry, selectedObjects, selectedViews)) {
+        tmpOutOfSyncBuildProfileEntries.push(templateId);
+      }
+    });
+    setOutOfSyncBuildProfileEntries(tmpOutOfSyncBuildProfileEntries);
+  }, [selectedObjects, selectedViews, modifiedBuildProfileEntries]);
 
   const updateBuildProfileEntry = (
     templateId: string,
     newBuildProfileEntry: MMBuildProfileEntry
   ) => {
-    console.log('update called: ', newBuildProfileEntry);
+    // Set the build profile entry in the map of modified build profile entries
     const newBuildProfileEntries = new Map(modifiedBuildProfileEntries);
     newBuildProfileEntries.set(templateId, newBuildProfileEntry);
     setModifiedBuildProfileEntries(newBuildProfileEntries);
+    if (!dirtyBuildProfileEntries.includes(templateId)) {
+      setDirtyBuildProfileEntries([...dirtyBuildProfileEntries, templateId]);
+    }
   };
 
   const updateSelectedObjects = (newSelectedObjects: string[]) => {
@@ -209,12 +239,13 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
         selectedBuildProfile,
         setSelectedBuildProfile,
         currentBuildProfile,
+        modifiedBuildProfileEntries,
+        updateBuildProfileEntry,
+        outOfSyncBuildProfileEntries,
         selectedObjects,
         updateSelectedObjects,
         selectedViews,
         updateSelectedViews,
-        modifiedBuildProfileEntries,
-        updateBuildProfileEntry,
       }}
     >
       {children}
