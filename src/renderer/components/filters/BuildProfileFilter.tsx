@@ -1,4 +1,4 @@
-import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
+import TransformOutlinedIcon from '@mui/icons-material/TransformOutlined';
 import {
   Card,
   FormControl,
@@ -7,20 +7,49 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useContext } from 'react';
 import { BuildProfilesContext } from 'renderer/providers/BuildProfileProvider';
 import { GenerateContext } from 'renderer/providers/GenerateProvider';
+import BuildProfileEditDialog from '../dialogs/BuildProfileEditDialog';
 
 export default function BuildProfileFilter() {
-  const { buildProfiles, readBuildProfiles } = useContext(BuildProfilesContext);
-  const { selectedBuildProfile, setSelectedBuildProfile } =
-    useContext(GenerateContext);
+  const { buildProfiles } = useContext(BuildProfilesContext);
+  const {
+    selectedBuildProfile,
+    setSelectedBuildProfile,
+    dirtyBuildProfileEntries,
+    currentBuildProfile,
+  } = useContext(GenerateContext);
 
   return (
     <Card elevation={2} sx={{ padding: 2 }}>
-      <Typography variant="h6">Build Profile</Typography>
+      <Grid container>
+        <Grid item xs>
+          <Typography variant="h6">Build Profile</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Stack direction="row" justifyContent="flex-end" alignItems="center">
+            <BuildProfileEditDialog
+              disabled={
+                currentBuildProfile && dirtyBuildProfileEntries.length === 0
+              }
+            />
+            <Tooltip
+              title="Generate from this Build Profile"
+              arrow
+              placement="top"
+            >
+              <IconButton aria-label="generate" color="primary">
+                <TransformOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </Grid>
+      </Grid>
       <Grid container sx={{ paddingTop: 2 }}>
         <Grid item xs>
           <FormControl fullWidth size="small">
@@ -49,17 +78,19 @@ export default function BuildProfileFilter() {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={1}>
-          <IconButton
-            color="primary"
-            aria-label="Refresh build profiles list"
-            onClick={() => {
-              readBuildProfiles();
-            }}
-          >
-            <RefreshOutlinedIcon fontSize="small" />
-          </IconButton>
-        </Grid>
+        {/**
+          <Grid item xs={1}>
+            <IconButton
+              color="primary"
+              aria-label="Refresh build profiles list"
+              onClick={() => {
+                readBuildProfiles();
+              }}
+            >
+              <RefreshOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Grid>
+           */}
       </Grid>
     </Card>
   );

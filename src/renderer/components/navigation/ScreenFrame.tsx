@@ -20,7 +20,7 @@ export default function ScreenFrame({ name, children }: ScreenFrameProps) {
             sx={{
               padding: 2,
               minHeight: '100%',
-              maxHeight: '250px',
+              maxHeight: '500px',
               overflow: 'auto',
             }}
           >

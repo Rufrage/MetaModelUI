@@ -1,6 +1,10 @@
-import { MMBuildProfile } from '@rufrage/metamodel';
+import { MMBuildProfile, MMBuildProfileEntry } from '@rufrage/metamodel';
 import { createContext, useEffect, useState } from 'react';
-import { getBuildProfileEntries } from 'renderer/services/BuildProfileEntryService';
+import {
+  addBuildProfileEntry,
+  getBuildProfileEntries,
+  saveBuildProfileEntry,
+} from 'renderer/services/BuildProfileEntryService';
 import {
   addBuildProfile,
   getBuildProfile,
@@ -11,10 +15,12 @@ import {
 export type BuildProfileContextContent = {
   buildProfiles: MMBuildProfile[];
   insertBuildProfile: (
-    buildProfile: MMBuildProfile
+    buildProfile: MMBuildProfile,
+    withBuildProfileEntries?: boolean
   ) => Promise<MMBuildProfile | undefined>;
   updateBuildProfile: (
-    buildProfile: MMBuildProfile
+    buildProfile: MMBuildProfile,
+    withBuildProfileEntries?: boolean
   ) => Promise<MMBuildProfile | undefined>;
   readBuildProfiles: () => Promise<boolean>;
   readBuildProfile: (
@@ -48,6 +54,39 @@ export default function BuildProfilesProvider({
 }: BuildProfilesProviderProps) {
   const [buildProfiles, setBuildProfiles] = useState<MMBuildProfile[]>([]);
 
+  async function saveBuildProfileEntries(
+    buildProfileId: string,
+    buildProfileEntries: MMBuildProfileEntry[]
+  ): Promise<MMBuildProfileEntry[] | undefined> {
+    try {
+      const newBuildProfileEntries: MMBuildProfileEntry[] = [];
+      buildProfileEntries.forEach(
+        async (buildProfileEntry: MMBuildProfileEntry) => {
+          buildProfileEntry.buildProfileID = buildProfileId;
+          if (buildProfileEntry.id) {
+            // Update
+            const updatedBuildProfileEntry = await saveBuildProfileEntry(
+              buildProfileId,
+              buildProfileEntry
+            );
+            newBuildProfileEntries.push(updatedBuildProfileEntry);
+          } else {
+            // Insert
+            const insertedBuildProfileEntry = await addBuildProfileEntry(
+              buildProfileId,
+              buildProfileEntry
+            );
+            newBuildProfileEntries.push(insertedBuildProfileEntry);
+          }
+        }
+      );
+      return newBuildProfileEntries;
+    } catch (error) {
+      console.log('Error: ', error);
+      return buildProfileEntries;
+    }
+  }
+
   async function readBuildProfiles(): Promise<boolean> {
     try {
       const buildProfileItems = await getBuildProfiles();
@@ -77,10 +116,17 @@ export default function BuildProfilesProvider({
   }
 
   async function insertBuildProfile(
-    newBuildProfile: MMBuildProfile
+    newBuildProfile: MMBuildProfile,
+    withBuildProfileEntries = false
   ): Promise<MMBuildProfile | undefined> {
     try {
       const addedBuildProfile = await addBuildProfile(newBuildProfile);
+      if (withBuildProfileEntries && addedBuildProfile.id) {
+        await saveBuildProfileEntries(
+          addedBuildProfile.id,
+          newBuildProfile.buildProfileEntries
+        );
+      }
       await readBuildProfiles();
       return addedBuildProfile;
     } catch (error) {
@@ -90,10 +136,17 @@ export default function BuildProfilesProvider({
   }
 
   async function updateBuildProfile(
-    updateData: MMBuildProfile
+    updateData: MMBuildProfile,
+    withBuildProfileEntries = false
   ): Promise<MMBuildProfile | undefined> {
     try {
       const updatedBuildProfile = await saveBuildProfile(updateData);
+      if (withBuildProfileEntries && updateData.id) {
+        await saveBuildProfileEntries(
+          updateData.id,
+          updateData.buildProfileEntries
+        );
+      }
       await readBuildProfiles();
       return updatedBuildProfile;
     } catch (error) {

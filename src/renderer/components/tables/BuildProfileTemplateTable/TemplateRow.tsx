@@ -1,4 +1,5 @@
 import { AutoAwesomeMosaicOutlined } from '@mui/icons-material';
+import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import {
   Badge,
@@ -20,9 +21,9 @@ import { Fragment, useContext, useState } from 'react';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import SyncDisabledIcon from '@mui/icons-material/SyncDisabled';
 import BuildProfileTransferList from 'renderer/components/lists/BuildProfileTransferList';
 import { GenerateContext } from 'renderer/providers/GenerateProvider';
-import SyncDisabledIcon from '@mui/icons-material/SyncDisabled';
 
 interface TemplateRowProps {
   buildProfileEntry: MMBuildProfileEntry;
@@ -33,8 +34,11 @@ export default function TemplateRow({
   buildProfileEntry,
   template = new MMTemplate('', ''),
 }: TemplateRowProps) {
-  const { updateBuildProfileEntry, outOfSyncBuildProfileEntries } =
-    useContext(GenerateContext);
+  const {
+    updateBuildProfileEntry,
+    outOfSyncBuildProfileEntries,
+    dirtyBuildProfileEntries,
+  } = useContext(GenerateContext);
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -108,6 +112,19 @@ export default function TemplateRow({
                   arrow
                 >
                   <SyncDisabledIcon />
+                </Tooltip>
+              </Grid>
+            )}
+            {dirtyBuildProfileEntries.includes(
+              buildProfileEntry.templateID
+            ) && (
+              <Grid item>
+                <Tooltip
+                  title="This template has been modified and not yet been saved."
+                  placement="top"
+                  arrow
+                >
+                  <CloudSyncOutlinedIcon />
                 </Tooltip>
               </Grid>
             )}

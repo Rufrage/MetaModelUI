@@ -17,6 +17,8 @@ const buildProfileConverter: FirestoreDataConverter<MMBuildProfile> = {
     return {
       name: buildProfile.name,
       description: buildProfile.description,
+      objectIDs: buildProfile.objectIDs,
+      viewIDs: buildProfile.viewIDs,
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
@@ -26,9 +28,8 @@ const buildProfileConverter: FirestoreDataConverter<MMBuildProfile> = {
       data.description,
       snapshot.id
     );
-    if (data.objectIDs) {
-      newBuildProfile.objectIDs = data.objectIDs;
-    }
+    newBuildProfile.objectIDs = data.objectIDs;
+    newBuildProfile.viewIDs = data.viewIDs;
 
     return newBuildProfile;
   },

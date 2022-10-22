@@ -63,7 +63,7 @@ export default function TransferList({
     // When the dataLst or the selectedLst change, we update the left list
     const tmpLeft: string[] = [];
     dataLst.reduce((result, entity) => {
-      if (entity.id && selectedLst.indexOf(entity.id) === -1) {
+      if (entity.id && selectedLst && selectedLst.indexOf(entity.id) === -1) {
         result.push(entity.id);
       }
       return result;
@@ -117,20 +117,25 @@ export default function TransferList({
           <Checkbox
             onClick={handleToggleAll(items)}
             checked={
-              numberOfChecked(items) === items.length && items.length !== 0
+              items &&
+              numberOfChecked(items) === items.length &&
+              items.length !== 0
             }
             indeterminate={
+              items &&
               numberOfChecked(items) !== items.length &&
               numberOfChecked(items) !== 0
             }
-            disabled={items.length === 0}
+            disabled={items && items.length === 0}
             inputProps={{
               'aria-label': 'all items selected',
             }}
           />
         }
         title={title}
-        subheader={`${numberOfChecked(items)}/${items.length} selected`}
+        subheader={`${numberOfChecked(items)}/${
+          items && items.length
+        } selected`}
       />
       <Divider />
       <List
@@ -143,37 +148,38 @@ export default function TransferList({
         component="div"
         role="list"
       >
-        {items.map((entityId: string) => {
-          const labelId = `transfer-list-all-item-${entityId}-label`;
+        {items &&
+          items.map((entityId: string) => {
+            const labelId = `transfer-list-all-item-${entityId}-label`;
 
-          return (
-            <ListItem
-              key={entityId}
-              role="listitem"
-              button
-              onClick={handleToggle(entityId)}
-            >
-              <ListItemIcon>
-                <Checkbox
-                  checked={checked.indexOf(entityId) !== -1}
-                  tabIndex={-1}
-                  disableRipple
-                  inputProps={{
-                    'aria-labelledby': labelId,
-                  }}
+            return (
+              <ListItem
+                key={entityId}
+                role="listitem"
+                button
+                onClick={handleToggle(entityId)}
+              >
+                <ListItemIcon>
+                  <Checkbox
+                    checked={checked && checked.indexOf(entityId) !== -1}
+                    tabIndex={-1}
+                    disableRipple
+                    inputProps={{
+                      'aria-labelledby': labelId,
+                    }}
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  id={labelId}
+                  primary={
+                    dataMap.get(entityId)
+                      ? dataMap.get(entityId)?.name
+                      : 'Template could not be found'
+                  }
                 />
-              </ListItemIcon>
-              <ListItemText
-                id={labelId}
-                primary={
-                  dataMap.get(entityId)
-                    ? dataMap.get(entityId)?.name
-                    : 'Template could not be found'
-                }
-              />
-            </ListItem>
-          );
-        })}
+              </ListItem>
+            );
+          })}
         <ListItem />
       </List>
     </Card>
@@ -191,7 +197,7 @@ export default function TransferList({
             variant="outlined"
             size="small"
             onClick={handleArrowRight}
-            disabled={leftChecked.length === 0}
+            disabled={leftChecked && leftChecked.length === 0}
             aria-label="move selected right"
           >
             &gt;
@@ -201,7 +207,7 @@ export default function TransferList({
             variant="outlined"
             size="small"
             onClick={handleArrowLeft}
-            disabled={rightChecked.length === 0}
+            disabled={rightChecked && rightChecked.length === 0}
             aria-label="move selected left"
           >
             &lt;

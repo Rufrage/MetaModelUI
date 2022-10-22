@@ -10,6 +10,8 @@ export type GenerateContextContent = {
   setSelectedBuildProfile: React.Dispatch<React.SetStateAction<string>>;
   // The MMBuildProfile for the currently selected Build Profile or undefined if none is selected
   currentBuildProfile: MMBuildProfile | undefined;
+  // Saves the currentBuildProfile and optionally its buildProfileEntries
+  saveBuildProfile: (withBuildProfileEntries?: boolean) => void;
 
   // The Build Profile Entries for the current Build Profile. Initialized from the Build Profile,
   // then updated via client. Can be saved back to the Build Profile.
@@ -26,6 +28,8 @@ export type GenerateContextContent = {
   updateSelectedObjects: (newSelectedObjects: string[]) => void;
   // Stores the templateIds for all BuildProfileEntries that are not in sync with the general inputs
   outOfSyncBuildProfileEntries: string[];
+  // Stores the templateIds for all BuildProfileEntries that have been modified and are flagged for saving
+  dirtyBuildProfileEntries: string[];
   // The currently selected views from the general inputs
   selectedViews: string[];
   // The update function for the currently selected views
@@ -36,9 +40,11 @@ export const GenerateContext = createContext<GenerateContextContent>({
   selectedBuildProfile: '-',
   setSelectedBuildProfile: () => {},
   currentBuildProfile: undefined,
+  saveBuildProfile: () => {},
   modifiedBuildProfileEntries: new Map(),
   updateBuildProfileEntry: () => {},
   outOfSyncBuildProfileEntries: [],
+  dirtyBuildProfileEntries: [],
   selectedObjects: [],
   updateSelectedObjects: () => {},
   selectedViews: [],
@@ -56,9 +62,9 @@ const isBuildProfileEntrySynced = (
   selectedViews: string[]
 ) => {
   return (
-    selectedObjects.sort().toString() ===
+    selectedObjects?.sort().toString() ===
       buildProfileEntry.objectIDs.sort().toString() &&
-    selectedViews.sort().toString() ===
+    selectedViews?.sort().toString() ===
       buildProfileEntry.viewIDs.sort().toString()
   );
 };
@@ -111,6 +117,7 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
       setSelectedObjects([]);
       setSelectedViews([]);
     }
+    setDirtyBuildProfileEntries([]);
   }, [currentBuildProfile]);
 
   // Constructs a "modified list" of build path entries. It is initialized from a build Profile and can be modified by the user.
@@ -168,6 +175,7 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
   };
 
   const updateSelectedObjects = (newSelectedObjects: string[]) => {
+    const tmpDirtyBuildProfileEntries: string[] = [...dirtyBuildProfileEntries];
     setSelectedObjects((currentSelectedObjects) => {
       if (newSelectedObjects.length > currentSelectedObjects.length) {
         // New Objects were added
@@ -176,9 +184,22 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
         );
         const newBuildProfileEntries = new Map(modifiedBuildProfileEntries);
         newBuildProfileEntries.forEach((buildProfileEntry) => {
-          addedObjects.forEach((addedObject) =>
-            buildProfileEntry.addObjectID(addedObject)
-          );
+          let isDirty = false;
+          addedObjects.forEach((addedObject) => {
+            if (!buildProfileEntry.objectIDs.includes(addedObject)) {
+              buildProfileEntry.objectIDs = [
+                ...buildProfileEntry.objectIDs,
+                addedObject,
+              ];
+              isDirty = true;
+            }
+          });
+          if (
+            isDirty &&
+            !tmpDirtyBuildProfileEntries.includes(buildProfileEntry.templateID)
+          ) {
+            tmpDirtyBuildProfileEntries.push(buildProfileEntry.templateID);
+          }
         });
         setModifiedBuildProfileEntries(newBuildProfileEntries);
       } else {
@@ -188,19 +209,33 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
         );
         const newBuildProfileEntries = new Map(modifiedBuildProfileEntries);
         newBuildProfileEntries.forEach((buildProfileEntry) => {
+          let isDirty = false;
           buildProfileEntry.objectIDs = buildProfileEntry.objectIDs.filter(
             (objectId) => {
-              return !removedObjects.includes(objectId);
+              if (!removedObjects.includes(objectId)) {
+                isDirty = true;
+                return true;
+              }
+              return false;
             }
           );
+          if (
+            isDirty &&
+            !tmpDirtyBuildProfileEntries.includes(buildProfileEntry.templateID)
+          ) {
+            tmpDirtyBuildProfileEntries.push(buildProfileEntry.templateID);
+          }
         });
+
         setModifiedBuildProfileEntries(newBuildProfileEntries);
       }
       return newSelectedObjects;
     });
+    setDirtyBuildProfileEntries(tmpDirtyBuildProfileEntries);
   };
 
   const updateSelectedViews = (newSelectedViews: string[]) => {
+    const tmpDirtyBuildProfileEntries: string[] = [...dirtyBuildProfileEntries];
     setSelectedViews((currentSelectedViews) => {
       if (newSelectedViews.length > currentSelectedViews.length) {
         // New Views were added
@@ -208,10 +243,19 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
           (o) => !currentSelectedViews.includes(o)
         );
         const newBuildProfileEntries = new Map(modifiedBuildProfileEntries);
+
         newBuildProfileEntries.forEach((buildProfileEntry) => {
-          addedViews.forEach((addedView) =>
-            buildProfileEntry.addViewID(addedView)
-          );
+          let isDirty = false;
+          addedViews.forEach((addedView) => {
+            buildProfileEntry.addViewID(addedView);
+            isDirty = true;
+          });
+          if (
+            isDirty &&
+            !tmpDirtyBuildProfileEntries.includes(buildProfileEntry.templateID)
+          ) {
+            tmpDirtyBuildProfileEntries.push(buildProfileEntry.templateID);
+          }
         });
         setModifiedBuildProfileEntries(newBuildProfileEntries);
       } else {
@@ -221,17 +265,31 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
         );
         const newBuildProfileEntries = new Map(modifiedBuildProfileEntries);
         newBuildProfileEntries.forEach((buildProfileEntry) => {
+          let isDirty = false;
           buildProfileEntry.viewIDs = buildProfileEntry.viewIDs.filter(
             (viewId) => {
-              return !removedViews.includes(viewId);
+              if (!removedViews.includes(viewId)) {
+                isDirty = true;
+                return true;
+              }
+              return false;
             }
           );
+          if (
+            isDirty &&
+            !tmpDirtyBuildProfileEntries.includes(buildProfileEntry.templateID)
+          ) {
+            tmpDirtyBuildProfileEntries.push(buildProfileEntry.templateID);
+          }
         });
         setModifiedBuildProfileEntries(newBuildProfileEntries);
       }
       return newSelectedViews;
     });
+    setDirtyBuildProfileEntries(tmpDirtyBuildProfileEntries);
   };
+
+  const saveBuildProfile = () => {};
 
   return (
     <GenerateContext.Provider
@@ -239,9 +297,11 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
         selectedBuildProfile,
         setSelectedBuildProfile,
         currentBuildProfile,
+        saveBuildProfile,
         modifiedBuildProfileEntries,
         updateBuildProfileEntry,
         outOfSyncBuildProfileEntries,
+        dirtyBuildProfileEntries,
         selectedObjects,
         updateSelectedObjects,
         selectedViews,
