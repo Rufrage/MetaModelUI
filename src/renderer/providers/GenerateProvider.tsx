@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { MMBuildProfile, MMBuildProfileEntry } from '@rufrage/metamodel';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { BuildProfilesContext } from './BuildProfileProvider';
@@ -34,6 +35,10 @@ export type GenerateContextContent = {
   selectedViews: string[];
   // The update function for the currently selected views
   updateSelectedViews: (newSelectedViews: string[]) => void;
+  // The target source path directory
+  targetSourcePath: string;
+  // Updates the target source path directory
+  updateTargetSourcePath: (newTargetSourcePath: string) => void;
 };
 
 export const GenerateContext = createContext<GenerateContextContent>({
@@ -49,6 +54,8 @@ export const GenerateContext = createContext<GenerateContextContent>({
   updateSelectedObjects: () => {},
   selectedViews: [],
   updateSelectedViews: () => {},
+  targetSourcePath: '',
+  updateTargetSourcePath: () => {},
 });
 
 interface GenerateProviderProps {
@@ -90,6 +97,8 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
 
   const [selectedObjects, setSelectedObjects] = useState<string[]>([]);
   const [selectedViews, setSelectedViews] = useState<string[]>([]);
+
+  const [targetSourcePath, setTargetSourcePath] = useState<string>('');
 
   // Fetches / Resets the build profile after changes in the corresponding dropdown
   useEffect(() => {
@@ -160,6 +169,25 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
     });
     setOutOfSyncBuildProfileEntries(tmpOutOfSyncBuildProfileEntries);
   }, [selectedObjects, selectedViews, modifiedBuildProfileEntries]);
+
+  useEffect(() => {
+    // Init target source path
+    const getTargetSourcePath = async () => {
+      const tmpTargetSourcePath = await window.electron.ipcRenderer
+        .invoke('getSourcePath')
+        .then((sourcePath) => {
+          console.log('[getTargetSourcePath] sourcePath: ', sourcePath);
+          return sourcePath;
+        })
+        .catch((error) => {
+          console.log('Error: ', error);
+        });
+      if (tmpTargetSourcePath && (tmpTargetSourcePath as []).length > 0) {
+        setTargetSourcePath(tmpTargetSourcePath[0]);
+      }
+    };
+    getTargetSourcePath();
+  }, []);
 
   const updateBuildProfileEntry = (
     templateId: string,
@@ -289,6 +317,13 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
     setDirtyBuildProfileEntries(tmpDirtyBuildProfileEntries);
   };
 
+  const updateTargetSourcePath = (newTargetSourcePath: string) => {
+    window.electron.ipcRenderer.sendMessage('setSourcePath', [
+      newTargetSourcePath,
+    ]);
+    setTargetSourcePath(newTargetSourcePath);
+  };
+
   const saveBuildProfile = () => {};
 
   return (
@@ -306,6 +341,8 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
         updateSelectedObjects,
         selectedViews,
         updateSelectedViews,
+        targetSourcePath,
+        updateTargetSourcePath,
       }}
     >
       {children}

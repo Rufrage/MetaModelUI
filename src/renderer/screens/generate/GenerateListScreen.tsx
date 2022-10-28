@@ -4,6 +4,7 @@ import BuildProfileTransferList from 'renderer/components/lists/BuildProfileTran
 import ScreenFrame from 'renderer/components/navigation/ScreenFrame';
 import BuildProfileTemplateTable from 'renderer/components/tables/BuildProfileTemplateTable';
 import { GenerateContext } from 'renderer/providers/GenerateProvider';
+import GenerateTargetPathSelector from './GenerateTargetPathSelector';
 
 export default function GenerateListScreen() {
   const {
@@ -16,6 +17,7 @@ export default function GenerateListScreen() {
   return (
     <ScreenFrame name="Generate">
       <BuildProfileFilter />
+      <GenerateTargetPathSelector />
       <BuildProfileTransferList
         title="General Input"
         selectedObjects={selectedObjects}

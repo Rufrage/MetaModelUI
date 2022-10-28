@@ -8,12 +8,12 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import { readdir } from 'fs';
 import path from 'path';
 import MenuBuilder from './menu';
+import { getSourcePath, setSourcePath } from './store';
 import { resolveHtmlPath } from './util';
 
 class AppUpdater {
@@ -132,10 +132,34 @@ app
   })
   .catch(console.log);
 
-ipcMain.handle('getTemplates', async () => {
-  console.log('getTemplates called!');
-  readdir(getAssetPath('/templates/'), (err, files) => {
-    if (err) console.log('Err: ', err);
-    return files;
-  });
+ipcMain.on('setSourcePath', (_event, newSourcePath: string) => {
+  setSourcePath(newSourcePath);
+});
+
+ipcMain.handle('getSourcePath', async (): Promise<string> => {
+  return getSourcePath();
+});
+
+ipcMain.handle('selectDirectory', async () => {
+  if (mainWindow) {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory'],
+    });
+    if (result.filePaths && result.filePaths.length > 0) {
+      return result.filePaths[0];
+    }
+  }
+  return null;
+});
+
+ipcMain.handle('selectFile', async () => {
+  if (mainWindow) {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openFile'],
+    });
+    if (result.filePaths && result.filePaths.length > 0) {
+      return result.filePaths[0];
+    }
+  }
+  return null;
 });
