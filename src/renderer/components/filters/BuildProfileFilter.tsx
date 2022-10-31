@@ -43,7 +43,13 @@ export default function BuildProfileFilter() {
               arrow
               placement="top"
             >
-              <IconButton aria-label="generate" color="primary">
+              <IconButton
+                aria-label="generate"
+                color="primary"
+                onClick={() => {
+                  window.electron.ipcRenderer.sendMessage('generate', []);
+                }}
+              >
                 <TransformOutlinedIcon />
               </IconButton>
             </Tooltip>

@@ -8,13 +8,15 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
+import { MMAttribute, MMAttributeType, MMObject } from '@rufrage/metamodel';
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import MenuBuilder from './menu';
-import { getSourcePath, setSourcePath } from './store';
-import { resolveHtmlPath } from './util';
+import { generate } from './util/generateUtil';
+import { resolveHtmlPath } from './util/htmlUtil';
+import { getSourcePath, setSourcePath } from './util/store';
 
 class AppUpdater {
   constructor() {
@@ -162,4 +164,35 @@ ipcMain.handle('selectFile', async () => {
     }
   }
   return null;
+});
+
+ipcMain.on('generateBuildProfile', (_event, newSourcePath: string) => {
+  console.log('Test');
+});
+
+ipcMain.on('generate', () => {
+  const newObj = new MMObject('Auto', 'Diese Klasse beschreibt ein Auto');
+  newObj.addAttribute(
+    new MMAttribute(
+      'Hersteller',
+      'Der Hersteller des Autos',
+      MMAttributeType.MMString
+    )
+  );
+  newObj.addAttribute(
+    new MMAttribute(
+      'Preis',
+      'Dies ist der Preis des Autos',
+      MMAttributeType.MMInteger
+    )
+  );
+  newObj.addAttribute(
+    new MMAttribute('ps', 'Die PS des Autos', MMAttributeType.MMInteger)
+  );
+  /**
+  *   generate(
+    'C:\\Users\\Ruben\\Documents\\GitHub\\MetaModelUI\\assets\\templates\\class.ejs',
+    newObj
+  );
+  */
 });

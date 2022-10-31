@@ -38,7 +38,6 @@ export default function GenerateTargetPathSelector() {
     /** Update the local target source path */
     setSubmitLoading(true);
     const newTargetSourcePath = data.targetSourcePath;
-    console.log(`[onSubmit] newTargetSourcePath: ${newTargetSourcePath}`);
     if (newTargetSourcePath && typeof newTargetSourcePath === 'string') {
       updateTargetSourcePath(newTargetSourcePath);
     }

@@ -176,7 +176,6 @@ export default function GenerateProvider({ children }: GenerateProviderProps) {
       const tmpTargetSourcePath = await window.electron.ipcRenderer
         .invoke('getSourcePath')
         .then((sourcePath) => {
-          console.log('[getTargetSourcePath] sourcePath: ', sourcePath);
           return sourcePath;
         })
         .catch((error) => {
