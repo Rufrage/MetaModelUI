@@ -3,8 +3,8 @@ import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
-import TransformOutlinedIcon from '@mui/icons-material/TransformOutlined';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import TransformOutlinedIcon from '@mui/icons-material/TransformOutlined';
 import {
   Button,
   Container,
@@ -14,9 +14,11 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
-import { useContext } from 'react';
+import plugin from 'js-plugin';
+import { useContext, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router-dom';
+import { MenuItem } from 'renderer/plugins/GeneratorPlugin';
 import { AuthContext } from 'renderer/providers/AuthProvider';
 import MenuListItem from './MenuLinkItem';
 
@@ -54,6 +56,13 @@ const Navigation = () => {
     navigate('/auth/register/');
   });
 
+  const [pluginMenuItems, setPluginMenuItems] = useState<MenuItem[]>([]);
+
+  useEffect(() => {
+    const menuItems = plugin.invoke('menu.getMenuItems');
+    setPluginMenuItems(menuItems as MenuItem[]);
+  }, []);
+
   return (
     <Container>
       <Grid container>
@@ -84,22 +93,22 @@ const Navigation = () => {
                         hotkey="H"
                         icon={<HomeOutlinedIcon fontSize="small" />}
                       />
-                      <MenuListItem
-                        route="/objects/"
-                        label="Objects"
-                        hotkey="O"
-                        icon={<DataObjectOutlinedIcon fontSize="small" />}
-                        nested
-                      />
-                      <MenuListItem
-                        route="/views/"
-                        label="Views"
-                        hotkey="V"
-                        icon={
-                          <AutoAwesomeMosaicOutlinedIcon fontSize="small" />
+                      {pluginMenuItems.map((menuItem) => {
+                        // Only return a MenuListItem, if the menuItem proviced a MenuName
+                        if (menuItem?.menuName) {
+                          return (
+                            <MenuListItem
+                              key={menuItem.menuName}
+                              route={menuItem?.route ? menuItem.route : ''}
+                              label={menuItem.menuName}
+                              hotkey={menuItem?.hotkey ? menuItem.hotkey : ''}
+                              icon={menuItem?.icon ? menuItem.icon : null}
+                              nested
+                            />
+                          );
                         }
-                        nested
-                      />
+                        return null;
+                      })}
                     </MenuList>
                     <Divider />
                     <MenuList>

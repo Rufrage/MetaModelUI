@@ -1,4 +1,11 @@
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import {
+  createTheme,
+  CssBaseline,
+  MenuItem,
+  ThemeProvider,
+} from '@mui/material';
+import plugin from 'js-plugin';
+import { useState, ReactElement, useEffect } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import 'renderer/App.css';
 import NavigationFrame from 'renderer/components/navigation/NavigationFrame';
@@ -11,15 +18,17 @@ import RegisterScreen from 'renderer/screens/auth/RegisterScreen';
 import GenerateListScreen from 'renderer/screens/generate/GenerateListScreen';
 import GenerateScreen from 'renderer/screens/generate/GenerateScreen';
 import HomeScreen from 'renderer/screens/home/HomeScreen';
-import ObjectFormScreen from 'renderer/screens/object/ObjectFormScreen';
-import ObjectListScreen from 'renderer/screens/object/ObjectListScreen';
-import ObjectScreen from 'renderer/screens/object/ObjectScreen';
+import ObjectFormScreen from 'renderer/plugins/ObjectPlugin/object/ObjectFormScreen';
+import ObjectListScreen from 'renderer/plugins/ObjectPlugin/object/ObjectListScreen';
+import ObjectScreen from 'renderer/plugins/ObjectPlugin/object/ObjectScreen';
 import TemplateFormScreen from 'renderer/screens/template/TemplateFormScreen';
 import TemplateListScreen from 'renderer/screens/template/TemplateListScreen';
 import TemplateScreen from 'renderer/screens/template/TemplateScreen';
-import ViewFormScreen from 'renderer/screens/view/ViewFormScreen';
-import ViewListScreen from 'renderer/screens/view/ViewListScreen';
-import ViewScreen from 'renderer/screens/view/ViewScreen';
+import ViewFormScreen from 'renderer/plugins/ViewPlugin/view/ViewFormScreen';
+import ViewListScreen from 'renderer/plugins/ViewPlugin/view/ViewListScreen';
+import ViewScreen from 'renderer/plugins/ViewPlugin/view/ViewScreen';
+import ObjectPlugin from './plugins/ObjectPlugin/ObjectPlugin';
+import ViewPlugin from './plugins/ViewPlugin/ViewPlugin';
 import BuildProfilesProvider from './providers/BuildProfileProvider';
 import GenerateProvider from './providers/GenerateProvider';
 
@@ -31,6 +40,22 @@ const themes = {
 };
 
 export default function App() {
+  if (!plugin.getPlugin(ObjectPlugin.name)) {
+    plugin.register(ObjectPlugin);
+  }
+  if (!plugin.getPlugin(ViewPlugin.name)) {
+    plugin.register(ViewPlugin);
+  }
+
+  const [navigationRouteItems, setNavigationRouteItems] = useState<
+    ReactElement[]
+  >([]);
+
+  useEffect(() => {
+    const routeItems = plugin.invoke('menu.getNavigationRoutes');
+    setNavigationRouteItems(routeItems as ReactElement[]);
+  }, []);
+
   return (
     <ThemeProvider theme={themes.dark}>
       <CssBaseline />
@@ -49,14 +74,6 @@ export default function App() {
                         }
                       >
                         <Route index element={<HomeScreen />} />
-                        <Route path="/objects/" element={<ObjectScreen />}>
-                          <Route index element={<ObjectListScreen />} />
-                          <Route path=":id" element={<ObjectFormScreen />} />
-                        </Route>
-                        <Route path="/views/" element={<ViewScreen />}>
-                          <Route index element={<ViewListScreen />} />
-                          <Route path=":id" element={<ViewFormScreen />} />
-                        </Route>
                         <Route path="/templates/" element={<TemplateScreen />}>
                           <Route index element={<TemplateListScreen />} />
                           <Route path=":id" element={<TemplateFormScreen />} />
@@ -64,6 +81,9 @@ export default function App() {
                         <Route path="/generate/" element={<GenerateScreen />}>
                           <Route index element={<GenerateListScreen />} />
                         </Route>
+                        {navigationRouteItems.map((navigationRouteItem) => {
+                          return navigationRouteItem;
+                        })}
                       </Route>
                       <Route
                         path="/auth/"
