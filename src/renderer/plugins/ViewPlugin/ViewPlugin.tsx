@@ -1,9 +1,9 @@
 import AutoAwesomeMosaicOutlinedIcon from '@mui/icons-material/AutoAwesomeMosaicOutlined';
 import { Route } from 'react-router-dom';
-import ObjectFormScreen from 'renderer/plugins/ObjectPlugin/object/ObjectFormScreen';
-import ObjectListScreen from 'renderer/plugins/ObjectPlugin/object/ObjectListScreen';
-import ObjectScreen from 'renderer/plugins/ObjectPlugin/object/ObjectScreen';
 import { GeneratorPlugin } from '../GeneratorPlugin';
+import ViewFormScreen from './view/ViewFormScreen';
+import ViewListScreen from './view/ViewListScreen';
+import ViewScreen from './view/ViewScreen';
 
 const route = '/views/';
 
@@ -21,9 +21,9 @@ const ViewPlugin: GeneratorPlugin = {
     },
     getNavigationRoutes() {
       return (
-        <Route path={route} element={<ObjectScreen />}>
-          <Route index element={<ObjectListScreen />} />
-          <Route path=":id" element={<ObjectFormScreen />} />
+        <Route path={route} element={<ViewScreen />}>
+          <Route index element={<ViewListScreen />} />
+          <Route path=":id" element={<ViewFormScreen />} />
         </Route>
       );
     },

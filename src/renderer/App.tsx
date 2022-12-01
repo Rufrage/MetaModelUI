@@ -1,11 +1,6 @@
-import {
-  createTheme,
-  CssBaseline,
-  MenuItem,
-  ThemeProvider,
-} from '@mui/material';
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import plugin from 'js-plugin';
-import { useState, ReactElement, useEffect } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import 'renderer/App.css';
 import NavigationFrame from 'renderer/components/navigation/NavigationFrame';
@@ -18,16 +13,9 @@ import RegisterScreen from 'renderer/screens/auth/RegisterScreen';
 import GenerateListScreen from 'renderer/screens/generate/GenerateListScreen';
 import GenerateScreen from 'renderer/screens/generate/GenerateScreen';
 import HomeScreen from 'renderer/screens/home/HomeScreen';
-import ObjectFormScreen from 'renderer/plugins/ObjectPlugin/object/ObjectFormScreen';
-import ObjectListScreen from 'renderer/plugins/ObjectPlugin/object/ObjectListScreen';
-import ObjectScreen from 'renderer/plugins/ObjectPlugin/object/ObjectScreen';
 import TemplateFormScreen from 'renderer/screens/template/TemplateFormScreen';
 import TemplateListScreen from 'renderer/screens/template/TemplateListScreen';
 import TemplateScreen from 'renderer/screens/template/TemplateScreen';
-import ViewFormScreen from 'renderer/plugins/ViewPlugin/view/ViewFormScreen';
-import ViewListScreen from 'renderer/plugins/ViewPlugin/view/ViewListScreen';
-import ViewScreen from 'renderer/plugins/ViewPlugin/view/ViewScreen';
-import ObjectPlugin from './plugins/ObjectPlugin/ObjectPlugin';
 import ViewPlugin from './plugins/ViewPlugin/ViewPlugin';
 import BuildProfilesProvider from './providers/BuildProfileProvider';
 import GenerateProvider from './providers/GenerateProvider';
@@ -40,9 +28,13 @@ const themes = {
 };
 
 export default function App() {
-  if (!plugin.getPlugin(ObjectPlugin.name)) {
-    plugin.register(ObjectPlugin);
-  }
+  import('./plugins/ObjectPlugin/ObjectPlugin')
+    .then((module) => {
+      module.init();
+      return true;
+    })
+    .catch((reason) => console.log(`Error loading plugin: ${reason}`));
+
   if (!plugin.getPlugin(ViewPlugin.name)) {
     plugin.register(ViewPlugin);
   }

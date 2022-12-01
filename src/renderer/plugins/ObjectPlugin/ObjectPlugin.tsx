@@ -1,13 +1,14 @@
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
+import plugin from 'js-plugin';
 import { Route } from 'react-router-dom';
-import ViewFormScreen from 'renderer/plugins/ViewPlugin/view/ViewFormScreen';
-import ViewListScreen from 'renderer/plugins/ViewPlugin/view/ViewListScreen';
-import ViewScreen from 'renderer/plugins/ViewPlugin/view/ViewScreen';
 import { GeneratorPlugin } from '../GeneratorPlugin';
+import ObjectFormScreen from './object/ObjectFormScreen';
+import ObjectListScreen from './object/ObjectListScreen';
+import ObjectScreen from './object/ObjectScreen';
 
 const route = '/objects/';
 
-const ObjectPlugin: GeneratorPlugin = {
+export const ObjectPlugin: GeneratorPlugin = {
   name: 'Object',
   route,
   menu: {
@@ -21,13 +22,20 @@ const ObjectPlugin: GeneratorPlugin = {
     },
     getNavigationRoutes() {
       return (
-        <Route path={route} element={<ViewScreen />}>
-          <Route index element={<ViewListScreen />} />
-          <Route path=":id" element={<ViewFormScreen />} />
+        <Route path={route} element={<ObjectScreen />}>
+          <Route index element={<ObjectListScreen />} />
+          <Route path=":id" element={<ObjectFormScreen />} />
         </Route>
       );
     },
   },
 };
 
-export default ObjectPlugin;
+export const init = () => {
+  if (!plugin.getPlugin(ObjectPlugin.name)) {
+    plugin.register(ObjectPlugin);
+    console.log('ObjectPlugin registered successfully!');
+  } else {
+    console.log('ObjectPlugin already registered!');
+  }
+};
