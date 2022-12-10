@@ -12,9 +12,9 @@ import { MMAttribute, MMAttributeType, MMObject } from '@rufrage/metamodel';
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
+import { IPluginInfo, PluginManager } from 'live-plugin-manager';
 import path from 'path';
 import MenuBuilder from './menu';
-import { generate } from './util/generateUtil';
 import { resolveHtmlPath } from './util/htmlUtil';
 import { getSourcePath, setSourcePath } from './util/store';
 
@@ -27,6 +27,7 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+const manager = new PluginManager();
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -164,6 +165,15 @@ ipcMain.handle('selectFile', async () => {
     }
   }
   return null;
+});
+
+ipcMain.handle('installPackage', async (_event, filepath: string) => {
+  const pluginInfo: IPluginInfo = await manager.installFromPath(filepath);
+  console.log(pluginInfo);
+  if (pluginInfo && pluginInfo.name?.length > 0) {
+    return true;
+  }
+  return false;
 });
 
 ipcMain.on('generateBuildProfile', (_event, newSourcePath: string) => {

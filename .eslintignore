@@ -14,6 +14,7 @@ coverage
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
+plugin_packages
 
 # OSX
 .DS_Store
@@ -21,6 +22,8 @@ node_modules
 release/app/dist
 release/build
 .erb/dll
+
+assets
 
 .idea
 npm-debug.log.*

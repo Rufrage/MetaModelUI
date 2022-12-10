@@ -13,6 +13,10 @@ declare global {
         invoke(channel: string, ...args: unknown[]): Promise<unknown>;
       };
     };
+    plugins: {
+      installModule(path: string): Promise<boolean>;
+      requireModule(name: string): Promise<any>;
+    };
   }
 }
 

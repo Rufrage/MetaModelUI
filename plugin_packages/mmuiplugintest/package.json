@@ -1,0 +1,11 @@
+{
+  "name": "mmuiplugintest",
+  "version": "1.0.0",
+  "description": "This is a test plugin for MeteModelUI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "R. Schwan",
+  "license": "ISC"
+}
