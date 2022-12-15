@@ -1,7 +1,0 @@
-/** * <%= object.description %> * */ export default class <%= object.name %> {
-<%_ if (object.attributes && object.attributes.length > 0) { _%> /** <%_
-object.attributes.forEach((attribute, index) => { _%> * <%= "@param " +
-attribute.name + " " + attribute.description %> <%_ }); _%> * */ constructor(
-<%_ object.attributes.forEach((attribute, index) => { _%> <%= attribute.name + "
-: " + getString4AttributeType(attribute.attributeType) + ((index + 1) ==
-object.attributes.length? "" : ",") %> <%_ }); _%> ) {} <% } _%> }

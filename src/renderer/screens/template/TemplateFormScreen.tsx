@@ -161,7 +161,7 @@ export default function TemplateFormScreen() {
               />
             </Grid>
             <Grid item xs={12} sx={{ paddingTop: 2 }}>
-              <FileInput
+              <TextFieldInput
                 control={control}
                 name="filepath"
                 label="Filepath"

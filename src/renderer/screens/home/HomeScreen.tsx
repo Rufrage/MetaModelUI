@@ -47,6 +47,14 @@ export default function HomeScreen() {
         >
           Require
         </Button>
+        <Button
+          variant="contained"
+          onClick={() => {
+            window.electron.ipcRenderer.sendMessage('generate', []);
+          }}
+        >
+          Generate
+        </Button>
       </Card>
     </ScreenFrame>
   );

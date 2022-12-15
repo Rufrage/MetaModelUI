@@ -1,0 +1,11 @@
+{
+	"output": [
+      <%_ .forEach((object, index) => { _%>
+      {
+        "filename": "<%= object.name %>.tsx",
+        "author": "<%= name %>",
+        "src": "<%- JSON.stringify(include("MultiObject", {object}).split(/\r?\n|\r|\n/g)); -%>"
+      }<% if (index < (objects.length - 1)) { %>,<% } %>
+      <%_ }); _%>
+	]
+}

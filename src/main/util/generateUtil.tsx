@@ -8,6 +8,7 @@ import {
   MMTemplateInputType,
   MMView,
 } from '@rufrage/metamodel';
+import path from 'path';
 import { getSourcePath } from './store';
 
 const ejs = require('ejs');
@@ -27,61 +28,63 @@ function getString4AttributeType(attributeType: MMAttributeType) {
 }
 
 function generate(
-  templateFilePath: string,
-  buildProfile: MMBuildProfile,
-  templates: Map<string, MMTemplate>,
-  objects: Map<string, MMObject>,
-  views: Map<string, MMView>
-) {
-  // Set enums
-  const enums = new Map();
-  enums.set('MMAttributeType', MMAttributeType);
+  targetFilePath: string,
+  buildProfileEntries: MMBuildProfileEntry[],
+  templates: MMTemplate[],
+  objects: MMObject[]
+): boolean {
+  const templateFilePath = path.join(__dirname, '../../../assets/templates/');
+  console.log('targetFilePath: ', targetFilePath);
+  console.log('templates: ', templates);
+  console.log('objects: ', objects);
+  console.log('buildProfileEntries: ', buildProfileEntries);
 
-  // Loop over all BuildPathEntries and generate each
-  buildProfile.buildProfileEntries.forEach(
-    (buildProfileEntry: MMBuildProfileEntry) => {
-      // First we check, if this buildProfileEntry is active as the associated template exists
-      const template = templates.get(buildProfileEntry.templateID);
-      if (!buildProfileEntry.active || !template) {
-        return;
-      }
-      // Next, we check the input types for this template
-      switch (template.objectInputType) {
-        case MMTemplateInputType.None:
-          // Nothing to do here
-          break;
-        case MMTemplateInputType.Single:
-          // TODO The template will be printed for every object
-          break;
-        case MMTemplateInputType.Multi:
-          // TODO All objects will be passed to the template at once
-          break;
-        default:
-          // Nothing to do here
-          break;
-      }
-    }
-  );
-
+  /**
+   * First we build the data object to pass the data to the template
+   */
   const data = {
-    getString4AttributeType,
-    object: null,
-    enums,
+    objects,
+    name: 'Janosch',
   };
 
-  ejs.renderFile(templateFilePath, data, async (err: string, str: string) => {
-    if (err) {
-      console.log(`[generate] err: ${err}`);
-    }
-    if (str) {
-      const targetDirectory = await getSourcePath();
-      if (targetDirectory) {
-        // const filePath = `${targetDirectory}\\${obj.name}.tsx`;
-        const filePath = `${targetDirectory}\\filename.tsx`;
-        fs.writeFileSync(filePath, str, 'utf8');
-      }
-    }
-  });
-}
+  /**
+   * Now we loop over all build path entries to decide which templates to generate.
+   */
+  buildProfileEntries?.forEach((buildProfileEntry: MMBuildProfileEntry) => {
+    /**
+     * We find the required template from the template list
+     */
+    const template = templates.find(
+      (t) => t.id === buildProfileEntry.templateID
+    );
 
+    /**
+     * The template path is built from the templates base path and the templates individual path
+     */
+    const templatePath = templateFilePath + template?.filepath;
+
+    /**
+     * Now we create the JSON from the template.
+     * The object contains a list of result files. Each file contains a target name and the source code.
+     */
+    ejs.renderFile(templatePath, data, async (err: string, str: string) => {
+      if (err?.length > 0) {
+        console.log(`[generate] err: ${err}`);
+      }
+      if (str?.length > 0) {
+        const obj = JSON.parse(str);
+        if (obj && obj.output && obj.output.length > 0 && targetFilePath) {
+          obj.output.forEach((file: { filename: any; src: any }) => {
+            const targetPath = targetFilePath + file.filename;
+            const src = file.src?.join('\n');
+
+            fs.writeFileSync(targetPath, src, 'utf8');
+          });
+        }
+      }
+    });
+  });
+
+  return true;
+}
 export { generate, getString4AttributeType };

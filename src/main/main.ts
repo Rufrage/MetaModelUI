@@ -8,13 +8,21 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { MMAttribute, MMAttributeType, MMObject } from '@rufrage/metamodel';
+import {
+  MMAttribute,
+  MMAttributeType,
+  MMBuildProfileEntry,
+  MMObject,
+  MMTemplate,
+  MMTemplateInputType,
+} from '@rufrage/metamodel';
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { IPluginInfo, PluginManager } from 'live-plugin-manager';
 import path from 'path';
 import MenuBuilder from './menu';
+import { generate } from './util/generateUtil';
 import { resolveHtmlPath } from './util/htmlUtil';
 import { getSourcePath, setSourcePath } from './util/store';
 
@@ -181,28 +189,73 @@ ipcMain.on('generateBuildProfile', (_event, newSourcePath: string) => {
 });
 
 ipcMain.on('generate', () => {
-  const newObj = new MMObject('Auto', 'Diese Klasse beschreibt ein Auto');
-  newObj.addAttribute(
+  const object1 = new MMObject('Auto', 'Diese Klasse beschreibt ein Auto');
+  object1.addAttribute(
     new MMAttribute(
       'Hersteller',
       'Der Hersteller des Autos',
       MMAttributeType.MMString
     )
   );
-  newObj.addAttribute(
+  object1.addAttribute(
     new MMAttribute(
       'Preis',
       'Dies ist der Preis des Autos',
       MMAttributeType.MMInteger
     )
   );
-  newObj.addAttribute(
+  object1.addAttribute(
     new MMAttribute('ps', 'Die PS des Autos', MMAttributeType.MMInteger)
   );
-  /**
-  *   generate(
-    'C:\\Users\\Ruben\\Documents\\GitHub\\MetaModelUI\\assets\\templates\\class.ejs',
-    newObj
+
+  const object2 = new MMObject('Pferd', 'Diese Klasse beschreibt ein Pferd');
+  object2.addAttribute(
+    new MMAttribute(
+      'Besitzer',
+      'Der Besitzer des Pferds',
+      MMAttributeType.MMString
+    )
   );
-  */
+  object2.addAttribute(
+    new MMAttribute(
+      'Preis',
+      'Dies ist der Preis des Pferds',
+      MMAttributeType.MMInteger
+    )
+  );
+  object2.addAttribute(
+    new MMAttribute('ps', 'Die PS des Pferds', MMAttributeType.MMInteger)
+  );
+
+  const objects = [object1, object2];
+
+  const template1 = new MMTemplate(
+    'Template',
+    'MultiObjectFrame.ejs',
+    'Test Template',
+    'ABC',
+    MMTemplateInputType.None,
+    MMTemplateInputType.None
+  );
+
+  const templates = [template1];
+
+  const buildProfileEntry1 = new MMBuildProfileEntry(
+    'ProfileEntry',
+    'Test Entry',
+    'NOPROFILE',
+    'ABC',
+    true,
+    'DEF'
+  );
+
+  const buildProfileEntries = [buildProfileEntry1];
+
+  generate(
+    'C:\\Users\\Ruben\\Documents\\GitHub\\MetaModelUI\\assets\\templates\\',
+    'C:\\Users\\Ruben\\Documents\\GitHub\\MetaModelUI\\assets\\output\\',
+    buildProfileEntries,
+    templates,
+    objects
+  );
 });

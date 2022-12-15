@@ -1,5 +1,7 @@
+import { MMBuildProfileEntry, MMObject, MMTemplate } from '@rufrage/metamodel';
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { IPluginInfo, PluginManager } from 'live-plugin-manager';
+import { generate } from './util/generateUtil';
 
 export type Channels = 'setSourcePath' | 'getSourcePath';
 
@@ -18,6 +20,17 @@ contextBridge.exposeInMainWorld('plugins', {
     const plugin = await manager.require(name);
     console.log(plugin);
     return plugin;
+  },
+});
+
+contextBridge.exposeInMainWorld('generator', {
+  generate: async (
+    targetFilePath: string,
+    buildProfileEntries: MMBuildProfileEntry[],
+    templates: MMTemplate[],
+    objects: MMObject[]
+  ) => {
+    return generate(targetFilePath, buildProfileEntries, templates, objects);
   },
 });
 

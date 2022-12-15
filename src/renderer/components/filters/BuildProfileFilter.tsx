@@ -11,19 +11,27 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { MMBuildProfileEntry } from '@rufrage/metamodel';
 import { useContext } from 'react';
 import { BuildProfilesContext } from 'renderer/providers/BuildProfileProvider';
 import { GenerateContext } from 'renderer/providers/GenerateProvider';
+import { ObjectsContext } from 'renderer/providers/ObjectsProvider';
+import { TemplatesContext } from 'renderer/providers/TemplatesProvider';
 import BuildProfileEditDialog from '../dialogs/BuildProfileEditDialog';
 
 export default function BuildProfileFilter() {
   const { buildProfiles } = useContext(BuildProfilesContext);
   const {
+    targetSourcePath,
     selectedBuildProfile,
     setSelectedBuildProfile,
     dirtyBuildProfileEntries,
     currentBuildProfile,
+    modifiedBuildProfileEntries,
   } = useContext(GenerateContext);
+
+  const { templates } = useContext(TemplatesContext);
+  const { objects } = useContext(ObjectsContext);
 
   return (
     <Card elevation={2} sx={{ padding: 2 }}>
@@ -47,7 +55,12 @@ export default function BuildProfileFilter() {
                 aria-label="generate"
                 color="primary"
                 onClick={() => {
-                  window.electron.ipcRenderer.sendMessage('generate', []);
+                  window.generator.generate(
+                    targetSourcePath,
+                    Array.from(modifiedBuildProfileEntries?.values()),
+                    templates,
+                    objects
+                  );
                 }}
               >
                 <TransformOutlinedIcon />

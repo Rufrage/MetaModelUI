@@ -1,3 +1,4 @@
+import { MMBuildProfileEntry, MMObject, MMTemplate } from '@rufrage/metamodel';
 import { Channels } from 'main/preload';
 
 declare global {
@@ -16,6 +17,14 @@ declare global {
     plugins: {
       installModule(path: string): Promise<boolean>;
       requireModule(name: string): Promise<any>;
+    };
+    generator: {
+      generate(
+        targetFilePath: string,
+        buildProfileEntries: MMBuildProfileEntry[],
+        templates: MMTemplate[],
+        objects: MMObject[]
+      ): Promise<boolean>;
     };
   }
 }
